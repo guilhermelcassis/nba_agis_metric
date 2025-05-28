@@ -110,8 +110,8 @@ try:
     games_df = playergamelogs.PlayerGameLogs(
         season_nullable = '2024-25',  # Temporada atual
         season_type_nullable=season_type,
-        date_from_nullable = "05/26/2025",                                                     
-        date_to_nullable = "05/26/2025"
+        date_from_nullable = "05/27/2025",                                                     
+        date_to_nullable = "05/27/2025"
     ).player_game_logs.get_data_frame()
 
     print("Calculando métricas de eficiência...")
@@ -152,6 +152,7 @@ try:
     result_df = games_df[['PLAYER_NAME',
                          'MATCHUP',
                          'OPP_RECORD',
+                         'MIN',
                          'PTS',
                          'REB',
                          'AST',

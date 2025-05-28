@@ -27,7 +27,7 @@ Where:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/guilhermelcassis/nba.git
+git clone https://github.com/guilhermelcassis/nba_agis_metric.git
 cd nba
 ```
 
