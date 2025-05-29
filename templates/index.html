@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+{{ macros.date_selector(start_date, end_date) }}
+
+{% if players %}
+    {{ macros.player_table(players) }}
+{% else %}
+    <div class="no-games">
+        <h2>{{ message }}</h2>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",
+            maxDate: "today",
+            theme: "dark"
+        });
+    });
+</script>
+{% endblock %} 

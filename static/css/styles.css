@@ -1,0 +1,575 @@
+/* Base Styles */
+body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Header Styles */
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+    background-color: #2d2d2d;
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+.header h1 {
+    color: #ff6b6b;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: #a0a0a0;
+    font-size: 1.2rem;
+    margin-bottom: 0;
+}
+
+/* Section Styles */
+.card-section {
+    margin-bottom: 1.5rem;
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.section-title {
+    margin: 2rem 0 1rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.section-title h2 {
+    color: #ff6b6b;
+    font-size: 1.8rem;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-right: 15px;
+}
+
+.section-title h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #ff6b6b, transparent);
+}
+
+#download-csv {
+    background-color: #4ecdc4;
+    border: none;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+#download-csv:hover {
+    background-color: #3db9b1;
+}
+
+.section-heading {
+    color: #ff6b6b;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    border-bottom: 1px solid #404040;
+    padding-bottom: 0.5rem;
+}
+
+/* Navigation Links */
+.nav-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    color: #ff6b6b;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #ff8f8f;
+    text-decoration: underline;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #404040 #2d2d2d;
+    border-radius: 6px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.data-table {
+    width: 100%;
+    background-color: transparent;
+    color: white;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+}
+
+.data-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #333;
+    border-color: #404040;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #a0a0a0;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.data-table tbody td {
+    border-color: #404040;
+    padding: 0.75rem;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1rem;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Home Page Specific */
+.date-selector {
+    background-color: #2d2d2d;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.date-selector label {
+    color: #a0a0a0;
+    margin-bottom: 0.5rem;
+}
+
+.date-selector input {
+    background-color: #404040;
+    border: 1px solid #505050;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 5px;
+}
+
+.date-selector input:focus {
+    background-color: #404040;
+    border-color: #ff6b6b;
+    color: white;
+    box-shadow: none;
+}
+
+.no-games {
+    text-align: center;
+    padding: 2rem;
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    color: #a0a0a0;
+}
+
+.player-name {
+    font-weight: bold;
+    color: #ff6b6b;
+    cursor: pointer;
+}
+
+.player-link {
+    color: #ff6b6b;
+    text-decoration: none;
+}
+
+.player-link:hover {
+    color: #ff8f8f;
+    text-decoration: underline;
+}
+
+.agis-score {
+    font-weight: bold;
+    color: #4ecdc4;
+}
+
+/* Salary Column */
+.salary {
+    font-weight: bold;
+    color: #ffd700; /* Gold color for salary */
+}
+
+/* AGIS/Game and Salary metrics */
+.agis-per-game {
+    font-weight: bold;
+    color: #4ecdc4; /* Same as AGIS Score */
+}
+
+.salary-per-agis {
+    font-weight: bold;
+    color: #ffa07a; /* Light salmon */
+}
+
+.salary-agis-per-game {
+    font-weight: bold;
+    color: #ff8c00; /* Dark orange */
+}
+
+/* Efficiency metrics highlighting */
+.efficiency-low {
+    color: #ff6b6b; /* Red for poor efficiency */
+}
+
+.efficiency-medium {
+    color: #ffcc5c; /* Yellow for average efficiency */
+}
+
+.efficiency-high {
+    color: #4ecdc4; /* Teal for good efficiency */
+}
+
+/* Player Details Page Specific */
+.summary-row {
+    display: flex;
+    margin-bottom: 1.5rem;
+}
+
+.summary-box {
+    flex: 1;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+    text-align: center;
+    background-color: #2d2d2d;
+}
+
+.summary-box:first-child {
+    margin-left: 0;
+}
+
+.summary-box:last-child {
+    margin-right: 0;
+}
+
+.summary-value {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #4ecdc4;
+}
+
+.summary-label {
+    color: #a0a0a0;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.5rem;
+}
+
+.stat-item {
+    flex: 1 0 150px;
+    margin: 0.8rem;
+    background-color: #333;
+    border-radius: 6px;
+    padding: 1.2rem;
+    text-align: center;
+    position: relative;
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #ff6b6b;
+}
+
+.stat-label {
+    color: #a0a0a0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.context-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Player information grid - use 3 columns for larger screens */
+.player-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.context-item {
+    padding: 1rem;
+    background-color: #333;
+    border-radius: 6px;
+}
+
+.context-item h3 {
+    font-size: 1rem;
+    color: #a0a0a0;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.context-item p {
+    font-size: 1.2rem;
+    margin: 0;
+    color: #ffffff;
+}
+
+.context-item p.salary-value {
+    color: #ffd166;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+/* Shooting & Percentage Styles */
+.shooting-bar {
+    height: 6px;
+    width: 100%;
+    background-color: #404040;
+    margin-top: 0.5rem;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.shooting-bar .fill {
+    height: 100%;
+    background-color: #4ecdc4;
+    border-radius: 3px;
+}
+
+.poor-pct .fill {
+    background-color: #ff6b6b;
+}
+
+.avg-pct .fill {
+    background-color: #ffbe0b;
+}
+
+.good-pct .fill {
+    background-color: #4ecdc4;
+}
+
+.shooting-pct {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    color: #a0a0a0;
+}
+
+.small-pct {
+    font-size: 0.8rem;
+    color: #a0a0a0;
+    white-space: nowrap;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+/* Game History Table Styles */
+.selected-game {
+    background-color: rgba(255, 107, 107, 0.15);
+    box-shadow: 0 0 0 1px rgba(255, 107, 107, 0.3);
+}
+
+.game-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.game-link:hover {
+    color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+.current-game {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+/* Flatpickr Calendar Styles */
+.flatpickr-calendar {
+    background-color: #2d2d2d;
+    color: white;
+    border: 1px solid #404040;
+}
+
+.flatpickr-day {
+    color: white;
+}
+
+.flatpickr-day.selected {
+    background-color: #ff6b6b;
+    border-color: #ff6b6b;
+}
+
+.flatpickr-day:hover {
+    background-color: #404040;
+}
+
+/* Scrollbar Styles */
+.table-container::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #2d2d2d;
+    border-radius: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #404040;
+    border-radius: 6px;
+    border: 2px solid #2d2d2d;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #505050;
+}
+
+/* Media Queries */
+@media (max-width: 767px) {
+    .data-table thead th,
+    .data-table tbody td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.85rem;
+    }
+    
+    .small-pct {
+        font-size: 0.7rem;
+    }
+    
+    .summary-value {
+        font-size: 2rem;
+    }
+    
+    .stat-item {
+        flex: 1 0 120px;
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+    }
+    
+    /* Player info grid for mobile - single column */
+    .player-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Compact Layout Styles */
+.compact-header {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.compact-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0;
+}
+
+.compact-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.compact-title {
+    margin: 0.5rem 0;
+}
+
+.compact-title h2 {
+    font-size: 1.5rem;
+}
+
+.compact-form label, .small-label {
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+    color: #a0a0a0;
+}
+
+.metrics-container {
+    padding: 0.5rem;
+    background-color: #333;
+    border-radius: 5px;
+}
+
+.compact-metrics {
+    margin-bottom: 0;
+    padding-left: 15px;
+    font-size: 0.9rem;
+}
+
+.compact-metrics li {
+    margin-bottom: 0.4rem;
+}
+
+.compact-metrics li:last-child {
+    margin-bottom: 0;
+}
+
+/* Sortable table styles */
+.sortable {
+    cursor: pointer;
+    position: relative;
+}
+
+.sortable::after {
+    content: "⇅";
+    font-size: 12px;
+    color: #aaa;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.sort-asc::after {
+    content: "↑";
+    color: #ff6b6b;
+}
+
+.sort-desc::after {
+    content: "↓";
+    color: #ff6b6b;
+}
+
+/* Add styles to make it more obvious that headers are clickable */
+.data-table thead th.sortable:hover {
+    background-color: #444;
+    color: #fff;
+} 

@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block content %}
+<!-- Simple page title -->
+<div class="header compact-header">
+    <h1>NBA Player Stats 2024-25</h1>
+</div>
+
+<!-- Compact layout with filters and key metrics side by side -->
+<div class="row">
+    <!-- Filter section - take 60% width on larger screens -->
+    <div class="col-lg-7">
+        <div class="card-section compact-card">
+            <div class="section-title compact-title">
+                <h2>Filter Players</h2>
+            </div>
+            
+            <form method="GET" action="/player-stats" class="compact-form">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <label for="team" class="small-label">Team</label>
+                        <select name="team" id="team" class="form-control form-control-sm">
+                            <option value="">All Teams</option>
+                            {% for team in teams %}
+                            <option value="{{ team }}" {% if selected_team == team %}selected{% endif %}>{{ team }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label for="position" class="small-label">Position</label>
+                        <select name="position" id="position" class="form-control form-control-sm">
+                            <option value="">All Positions</option>
+                            {% for pos in positions %}
+                            <option value="{{ pos }}" {% if selected_position == pos %}selected{% endif %}>{{ pos }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label for="sort_by" class="small-label">Sort By</label>
+                        <select name="sort_by" id="sort_by" class="form-control form-control-sm">
+                            <option value="agis_score" {% if sort_by == 'agis_score' %}selected{% endif %}>AGIS Score</option>
+                            <option value="agis_per_game" {% if sort_by == 'agis_per_game' %}selected{% endif %}>AGIS Per Game</option>
+                            <option value="salary" {% if sort_by == 'salary' %}selected{% endif %}>Salary</option>
+                            <option value="points" {% if sort_by == 'points' %}selected{% endif %}>Points</option>
+                            <option value="rebounds" {% if sort_by == 'rebounds' %}selected{% endif %}>Rebounds</option>
+                            <option value="assists" {% if sort_by == 'assists' %}selected{% endif %}>Assists</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label for="direction" class="small-label">Direction</label>
+                        <select name="direction" id="direction" class="form-control form-control-sm">
+                            <option value="desc" {% if direction == 'desc' %}selected{% endif %}>Descending</option>
+                            <option value="asc" {% if direction == 'asc' %}selected{% endif %}>Ascending</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <button type="submit" class="btn btn-sm btn-primary" style="background-color: #ff6b6b; border: none;">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Key metrics section - take 40% width on larger screens -->
+    <div class="col-lg-5">
+        <div class="card-section compact-card">
+            <div class="section-title compact-title">
+                <h2>Key Metrics</h2>
+            </div>
+            
+            <div class="metrics-container">
+                <ul class="compact-metrics">
+                    <li><span class="agis-score">AGIS</span> - Advanced Game Impact Score (total for season)</li>
+                    <li><span class="agis-per-game">AGIS/G</span> - AGIS per Game (average impact per game)</li>
+                    <li><span class="salary-per-agis">$/AGIS</span> - Dollars per AGIS point (cost per impact unit)</li>
+                    <li><span class="salary-agis-per-game">$/AGIS/G</span> - (Salary × Games) ÷ AGIS² - Value metric that rewards sustained high performance</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Player Statistics Table -->
+<div class="card-section">
+    <div class="section-title">
+        <h2>Player Statistics</h2>
+        <button id="download-csv" class="btn btn-sm btn-success">Download CSV</button>
+    </div>
+    
+    <div class="table-container">
+        <table class="data-table sortable" id="player-stats-table">
+            <thead>
+                <tr>
+                    <th data-sort="string">Player</th>
+                    <th data-sort="string">Team</th>
+                    <th data-sort="string">Pos</th>
+                    <th data-sort="int" data-column="games_played">GP</th>
+                    <th data-sort="int" data-column="games_started">GS</th>
+                    <th data-sort="int" data-column="minutes">MIN</th>
+                    <th data-sort="float" data-column="points">PTS</th>
+                    <th data-sort="float" data-column="rebounds">REB</th>
+                    <th data-sort="float" data-column="assists">AST</th>
+                    <th data-sort="float" data-column="steals">STL</th>
+                    <th data-sort="float" data-column="blocks">BLK</th>
+                    <th data-sort="float" data-column="fg_pct">FG%</th>
+                    <th data-sort="float" data-column="fg3_pct">3P%</th>
+                    <th data-sort="float" data-column="ft_pct">FT%</th>
+                    <th data-sort="float" data-column="efficiency">EFF</th>
+                    <th data-sort="float" data-column="agis_score">AGIS</th>
+                    <th data-sort="float" data-column="agis_per_game">AGIS/G</th>
+                    <th data-sort="int" data-column="salary">Salary ($)</th>
+                    <th>$/AGIS</th>
+                    <th>$/AGIS/G</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td class="player-name">
+                        <a href="/player-details/{{ player.player_id }}" class="player-link">
+                            {{ player.player_name }}
+                        </a>
+                    </td>
+                    <td>{{ player.team_abbreviation }}</td>
+                    <td>{{ player.position }}</td>
+                    <td>{{ player.games_played }}</td>
+                    <td>{{ player.games_started }}</td>
+                    <td>{{ player.minutes }}</td>
+                    <td>{{ player.points }}</td>
+                    <td>{{ player.rebounds }}</td>
+                    <td>{{ player.assists }}</td>
+                    <td>{{ player.steals }}</td>
+                    <td>{{ player.blocks }}</td>
+                    <td>{{ "%.3f"|format(player.fg_pct) }}</td>
+                    <td>{{ "%.3f"|format(player.fg3_pct) }}</td>
+                    <td>{{ "%.3f"|format(player.ft_pct) }}</td>
+                    <td class="{% if player.efficiency > 2500 %}efficiency-high{% elif player.efficiency > 1500 %}efficiency-medium{% else %}efficiency-low{% endif %}">
+                        {{ "%.1f"|format(player.efficiency) }}
+                    </td>
+                    <td class="agis-score">{{ "%.1f"|format(player.agis_score) }}</td>
+                    <td class="agis-per-game">{{ "%.1f"|format(player.agis_per_game) }}</td>
+                    <td class="salary">${{ "{:,}".format(player.salary|int) }}</td>
+                    <td class="salary-per-agis">{{ "%.1f"|format(player.salary_per_agis) }}</td>
+                    <td class="salary-agis-per-game">{{ "%.1f"|format(player.salary_agis_per_game) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the table sorter
+        initTableSort('player-stats-table');
+        
+        // Initialize CSV download
+        document.getElementById('download-csv').addEventListener('click', function() {
+            downloadTableAsCSV('player-stats-table', 'nba_player_stats.csv');
+        });
+    });
+    
+    function downloadTableAsCSV(tableId, filename) {
+        const table = document.getElementById(tableId);
+        const rows = table.querySelectorAll('tr');
+        const csvContent = [];
+        
+        // Extract headers
+        const headers = [];
+        table.querySelectorAll('thead th').forEach(th => {
+            headers.push(th.textContent.trim());
+        });
+        csvContent.push(headers.join(','));
+        
+        // Extract data rows
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const rowData = [];
+            row.querySelectorAll('td').forEach(cell => {
+                // Get text content, but remove any link elements
+                let content = cell.textContent.trim();
+                // Remove commas from numbers and escape any commas in text
+                content = content.includes('$') ? content.replace(/[$,]/g, '') : content;
+                content = content.includes(',') ? `"${content}"` : content;
+                rowData.push(content);
+            });
+            csvContent.push(rowData.join(','));
+        });
+        
+        // Create and download the CSV file
+        const csvString = csvContent.join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        // Create download link
+        if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, filename);
+        } else {
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    }
+</script>
+{% endblock %} 

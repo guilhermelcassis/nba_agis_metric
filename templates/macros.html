@@ -1,0 +1,156 @@
+{% macro stat_item(value, label, class_name="") %}
+<div class="stat-item {{ class_name }}">
+    <div class="stat-value">{{ value }}</div>
+    <div class="stat-label">{{ label }}</div>
+</div>
+{% endmacro %}
+
+{% macro shooting_stat(made, attempted, percentage, label, thresholds=[0.4, 0.5]) %}
+<div class="stat-item">
+    <div class="stat-value">{{ made }}/{{ attempted }}</div>
+    <div class="stat-label">{{ label }}</div>
+    <div class="shooting-bar {{ 'poor-pct' if percentage < thresholds[0] else 'avg-pct' if percentage < thresholds[1] else 'good-pct' }}">
+        <div class="fill" style="width: {{ (percentage * 100)|int }}%"></div>
+    </div>
+    <div class="shooting-pct">{{ "%.1f"|format(percentage * 100) }}%</div>
+</div>
+{% endmacro %}
+
+{% macro summary_box(value, label) %}
+<div class="summary-box">
+    <div class="summary-value">{{ value }}</div>
+    <div class="summary-label">{{ label }}</div>
+</div>
+{% endmacro %}
+
+{% macro context_item(title, value) %}
+<div class="context-item">
+    <h3>{{ title }}</h3>
+    <p>{{ value }}</p>
+</div>
+{% endmacro %}
+
+{% macro context_item_salary(title, value) %}
+<div class="context-item">
+    <h3>{{ title }}</h3>
+    <p class="salary-value">{{ value }}</p>
+</div>
+{% endmacro %}
+
+{% macro player_table(players) %}
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Date</th>
+                <th>Matchup</th>
+                <th>Opponent Record</th>
+                <th>Game Minutes</th>
+                <th>PTS</th>
+                <th>REB</th>
+                <th>AST</th>
+                <th>STL</th>
+                <th>BLK</th>
+                <th>EFF</th>
+                <th>AGIS</th>
+                <th>Salary (2024-25)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+            <tr>
+                <td class="player-name">
+                    <a href="/player/{{ player.PLAYER_NAME }}/{{ player.GAME_DATE }}" class="player-link">
+                        {{ player.PLAYER_NAME }}
+                    </a>
+                </td>
+                <td>{{ player.GAME_DATE }}</td>
+                <td>{{ player.MATCHUP }}</td>
+                <td>{{ player.OPP_RECORD }}</td>
+                <td>{{ player.MIN_SEC }}</td>
+                <td>{{ player.PTS }}</td>
+                <td>{{ player.REB }}</td>
+                <td>{{ player.AST }}</td>
+                <td>{{ player.STL }}</td>
+                <td>{{ player.BLK }}</td>
+                <td>{{ "%.2f"|format(player.EFF) }}</td>
+                <td class="agis-score">{{ "%.2f"|format(player.AGIS) }}</td>
+                <td class="salary">{{ player.SALARY }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro date_selector(start_date, end_date) %}
+<div class="date-selector">
+    <form method="GET" action="/" class="row g-3">
+        <div class="col-md-5">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input type="text" class="form-control datepicker" id="start_date" name="start_date" 
+                   value="{{ start_date }}" required>
+        </div>
+        <div class="col-md-5">
+            <label for="end_date" class="form-label">End Date</label>
+            <input type="text" class="form-control datepicker" id="end_date" name="end_date" 
+                   value="{{ end_date }}" required>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100" style="background-color: #ff6b6b; border: none;">
+                Search
+            </button>
+        </div>
+    </form>
+</div>
+{% endmacro %}
+
+{% macro player_game_history(all_games, selected_date) %}
+<div class="table-container">
+    <table class="data-table" id="gameHistoryTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Matchup</th>
+                <th>Opp. Record</th>
+                <th>MIN</th>
+                <th>PTS</th>
+                <th>REB</th>
+                <th>AST</th>
+                <th>STL</th>
+                <th>BLK</th>
+                <th>FG</th>
+                <th>3PT</th>
+                <th>FT</th>
+                <th>EFF</th>
+                <th>AGIS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for game in all_games %}
+            <tr {% if game.GAME_DATE == selected_date %}class="selected-game"{% endif %}>
+                <td>
+                    <a href="/player/{{ game.PLAYER_NAME }}/{{ game.GAME_DATE }}" class="game-link {% if game.GAME_DATE == selected_date %}current-game{% endif %}">
+                        {{ game.GAME_DATE }}
+                    </a>
+                </td>
+                <td>{{ game.MATCHUP }}</td>
+                <td>{{ game.OPP_RECORD }}</td>
+                <td>{{ game.MIN_SEC }}</td>
+                <td>{{ game.PTS }}</td>
+                <td>{{ game.REB }}</td>
+                <td>{{ game.AST }}</td>
+                <td>{{ game.STL }}</td>
+                <td>{{ game.BLK }}</td>
+                <td>{{ game.FGM }}/{{ game.FGA }} <span class="small-pct">({{ "%.1f"|format(game.FG_PCT * 100) }}%)</span></td>
+                <td>{{ game.FG3M }}/{{ game.FG3A }} <span class="small-pct">({{ "%.1f"|format(game.FG3_PCT * 100) }}%)</span></td>
+                <td>{{ game.FTM }}/{{ game.FTA }} <span class="small-pct">({{ "%.1f"|format(game.FT_PCT * 100) }}%)</span></td>
+                <td>{{ "%.2f"|format(game.EFF) }}</td>
+                <td>{{ "%.2f"|format(game.AGIS) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %} 

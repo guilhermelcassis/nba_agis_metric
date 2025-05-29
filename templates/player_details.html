@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ player.PLAYER_NAME }} - Game Details{% endblock %}
+
+{% block navigation %}
+<a href="/" class="nav-link">← Back to All Players</a>
+{% endblock %}
+
+{% block header %}
+<div class="header">
+    <h1>{{ player.PLAYER_NAME }}</h1>
+    <p>{{ player.GAME_DATE }} - {{ player.MATCHUP }}</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card-section">
+    <h2 class="section-heading">Player Information</h2>
+    <div class="player-info-grid">
+        {% if player_db %}
+            {{ macros.context_item("Position", player_db.position) }}
+            {{ macros.context_item("Age", player_db.age) }}
+            {{ macros.context_item("Height", player_db.height) }}
+            {{ macros.context_item("Weight", player_db.weight ~ " lbs") if player_db.weight else macros.context_item("Weight", "N/A") }}
+            {{ macros.context_item("Team", player_db.team_name) }}
+            {{ macros.context_item("Jersey #", player_db.jersey) }}
+            {{ macros.context_item_salary("2024-25 Salary", player_db.salary) }}
+            {{ macros.context_item("Country", player_db.country) }}
+            {{ macros.context_item("Experience", player_db.seasons_exp ~ " years") if player_db.seasons_exp else macros.context_item("Experience", "N/A") }}
+            {{ macros.context_item("College", player_db.college) if player_db.college else macros.context_item("College", "N/A") }}
+            {% if player_db.draft_year and player_db.draft_year != '' %}
+                {% set draft_info = "Round " ~ player_db.draft_round ~ ", Pick " ~ player_db.draft_number ~ " (" ~ player_db.draft_year ~ ")" %}
+                {{ macros.context_item("Draft", draft_info) }}
+            {% else %}
+                {{ macros.context_item("Draft", "Undrafted") }}
+            {% endif %}
+        {% else %}
+            {{ macros.context_item("Name", player.PLAYER_NAME) }}
+            {{ macros.context_item_salary("2024-25 Salary", player.SALARY) }}
+        {% endif %}
+    </div>
+</div>
+
+<div class="card-section">
+    <h2 class="section-heading">Game History</h2>
+    {{ macros.player_game_history(all_games, selected_date) }}
+</div>
+
+<div class="section-title">
+    <h2>Selected Game Details: {{ player.GAME_DATE }}</h2>
+</div>
+
+<div class="card-section">
+    <h2 class="section-heading">Game Context</h2>
+    <div class="context-grid">
+        {{ macros.context_item("Opponent", player.MATCHUP) }}
+        {{ macros.context_item("Opponent Record", player.OPP_RECORD) }}
+        {{ macros.context_item("Minutes Played", player.MIN_SEC) }}
+    </div>
+</div>
+
+<div class="summary-row">
+    {{ macros.summary_box(player.PTS, "Points") }}
+    {{ macros.summary_box("%.2f"|format(player.EFF), "Efficiency") }}
+    {{ macros.summary_box("%.2f"|format(player.AGIS), "AGIS Score") }}
+</div>
+
+<div class="card-section">
+    <h2 class="section-heading">Scoring Breakdown</h2>
+    <div class="stat-row">
+        {{ macros.shooting_stat(player.FGM, player.FGA, player.FG_PCT, "Field Goals", [0.4, 0.5]) }}
+        {{ macros.shooting_stat(player.FG3M, player.FG3A, player.FG3_PCT, "3-Pointers", [0.33, 0.4]) }}
+        {{ macros.shooting_stat(player.FTM, player.FTA, player.FT_PCT, "Free Throws", [0.7, 0.8]) }}
+    </div>
+</div>
+
+<div class="card-section">
+    <h2 class="section-heading">Key Stats</h2>
+    <div class="stat-row">
+        {{ macros.stat_item(player.REB, "Rebounds") }}
+        {{ macros.stat_item(player.AST, "Assists") }}
+        {{ macros.stat_item(player.STL, "Steals") }}
+        {{ macros.stat_item(player.BLK, "Blocks") }}
+        {{ macros.stat_item(player.TOV, "Turnovers") }}
+    </div>
+</div>
+
+<div class="card-section">
+    <h2 class="section-heading">Advanced Stats</h2>
+    <div class="stat-row">
+        {{ macros.stat_item(player.OREB, "Off. Rebounds") }}
+        {{ macros.stat_item(player.DREB, "Def. Rebounds") }}
+        {{ macros.stat_item(player.PLUS_MINUS, "Plus/Minus") }}
+        {{ macros.stat_item(player.PF, "Personal Fouls") }}
+    </div>
+</div>
+{% endblock %} 

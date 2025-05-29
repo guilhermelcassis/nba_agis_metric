@@ -17,6 +17,31 @@ Where:
 - EFF: Efficiency Rating
 - win_rate_do_oponente: Opponent's win rate
 
+## Key Metrics
+
+The project calculates several key performance and financial metrics:
+
+### Performance Metrics
+
+- **AGIS**: Advanced Game Impact Score - A comprehensive measure of a player's impact that weighs various statistics and adjusts for opponent strength
+- **AGIS/G**: AGIS per Game - The average impact a player has per game played
+
+### Financial Metrics
+
+- **$/AGIS**: Dollars per AGIS point - How much a team is paying per unit of player impact (calculated as Salary ÷ AGIS). This metric shows the cost of each "impact unit" a player generates.
+
+- **$/AGIS/G**: Dollars per AGIS per Game - This is the key value metric that measures cost efficiency of a player's game-by-game impact. Calculated as:
+  ```
+  $/AGIS/G = (Salary × Games) ÷ (AGIS × AGIS) = (Salary × Games) ÷ AGIS²
+  ```
+
+  This metric effectively tells you how much a team is paying for each square unit of impact over the season. By factoring in both games played and the square of impact (AGIS²), it rewards players who maintain consistent high performance over more games. Lower values indicate better value from a player's contract relative to their performance. It's particularly useful for:
+  
+  - Identifying undervalued players (those producing high impact at low cost)
+  - Evaluating contract efficiency with an emphasis on sustained performance
+  - Comparing players at different salary levels on an equal value basis
+  - Penalizing players with high salaries but limited impact or playing time
+
 ## Requirements
 
 - Python 3.x

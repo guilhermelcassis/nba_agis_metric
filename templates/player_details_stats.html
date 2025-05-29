@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+
+{% block content %}
+<div class="header">
+    <h1>{{ player.player_name }}</h1>
+    <p>{{ player.team_name }} | {{ player.position }}</p>
+</div>
+
+<!-- Player Summary -->
+<div class="card-section">
+    <div class="section-title">
+        <h2>Player Summary</h2>
+    </div>
+    
+    <div class="summary-row">
+        {{ macros.summary_box(player.points, "Points") }}
+        {{ macros.summary_box(player.rebounds, "Rebounds") }}
+        {{ macros.summary_box(player.assists, "Assists") }}
+        {{ macros.summary_box(player.steals, "Steals") }}
+        {{ macros.summary_box(player.blocks, "Blocks") }}
+    </div>
+</div>
+
+<!-- Player Details -->
+<div class="card-section">
+    <div class="player-info-grid">
+        <div class="context-grid">
+            <h3 class="section-heading">Personal Info</h3>
+            {{ macros.context_item("Age", player.age) }}
+            {{ macros.context_item("Height", player.height) }}
+            {{ macros.context_item("Weight", player.weight) }}
+            {{ macros.context_item("Country", player.country) }}
+        </div>
+        
+        <div class="context-grid">
+            <h3 class="section-heading">Career Info</h3>
+            {{ macros.context_item("Experience", player.seasons_exp ~ " years") }}
+            {{ macros.context_item("College", player.college) }}
+            {{ macros.context_item("Draft", player.draft_year ~ " (Rd " ~ player.draft_round ~ ", Pick " ~ player.draft_number ~ ")") }}
+            {{ macros.context_item("Jersey", "#" ~ player.jersey) }}
+        </div>
+        
+        <div class="context-grid">
+            <h3 class="section-heading">Season Stats</h3>
+            {{ macros.context_item("Games Played", player.games_played) }}
+            {{ macros.context_item("Games Started", player.games_started) }}
+            {{ macros.context_item("Minutes", player.minutes) }}
+            {{ macros.context_item("Efficiency", player.efficiency) }}
+        </div>
+        
+        <div class="context-grid">
+            <h3 class="section-heading">Financial</h3>
+            {{ macros.context_item_salary("Salary (24-25)", "$" ~ "{:,}".format(player.salary|int)) }}
+            {{ macros.context_item("AGIS/Game", "<span class='agis-per-game'>" ~ ("%.1f"|format(player.agis_per_game)) ~ "</span>") }}
+            {{ macros.context_item("$/AGIS", "<span class='salary-per-agis'>" ~ ("%.1f"|format(player.salary_per_agis)) ~ "</span>") }}
+            {{ macros.context_item("$/AGIS/Game", "<span class='salary-agis-per-game'>" ~ ("%.1f"|format(player.salary_agis_per_game)) ~ "</span>") }}
+        </div>
+    </div>
+    
+    <div style="margin-top: 15px; padding: 10px; background-color: #333; border-radius: 5px; font-size: 0.9em;">
+        <p style="margin-bottom: 5px;"><strong>Understanding Value Metrics:</strong></p>
+        <ul style="margin-bottom: 0; padding-left: 20px;">
+            <li><span class="salary-per-agis">$/AGIS</span> - Shows how much a team is paying per unit of player impact (Salary ÷ AGIS)</li>
+            <li><span class="salary-agis-per-game">$/AGIS/G</span> - Calculated as (Salary × Games) ÷ AGIS². This value metric rewards consistent high performance across more games. Lower values indicate better contract efficiency relative to sustained impact.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Shooting Percentages -->
+<div class="card-section">
+    <div class="section-title">
+        <h2>Shooting Percentages</h2>
+    </div>
+    
+    <div class="stat-row">
+        {{ macros.shooting_stat(0, 0, player.fg_pct, "Field Goal %", [0.43, 0.5]) }}
+        {{ macros.shooting_stat(0, 0, player.fg3_pct, "3-Point %", [0.33, 0.4]) }}
+        {{ macros.shooting_stat(0, 0, player.ft_pct, "Free Throw %", [0.75, 0.85]) }}
+    </div>
+</div>
+
+<!-- Efficiency Metrics -->
+<div class="card-section">
+    <div class="section-title">
+        <h2>Performance Metrics</h2>
+    </div>
+    
+    <div class="stat-row">
+        {{ macros.stat_item(player.efficiency, "Efficiency", "efficiency-" ~ ("high" if player.efficiency > 2500 else "medium" if player.efficiency > 1500 else "low")) }}
+        {{ macros.stat_item("%.1f"|format(player.agis_score), "AGIS Score", "agis-score") }}
+        {{ macros.stat_item("%.1f"|format(player.agis_per_game), "AGIS Per Game", "agis-per-game") }}
+        {{ macros.stat_item("%.1f"|format(player.salary_agis_per_game), "$/AGIS/Game", "salary-agis-per-game") }}
+    </div>
+</div>
+
+<!-- Back Button -->
+<div class="mt-4">
+    <a href="/player-stats" class="nav-link">← Back to Player Stats</a>
+</div>
+{% endblock %} 
