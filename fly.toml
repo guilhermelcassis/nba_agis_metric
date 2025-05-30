@@ -3,8 +3,9 @@ primary_region = "ewr" # Change this to your preferred region
 kill_signal = "SIGINT"
 kill_timeout = 5
 
-[build]
-  builder = "paketobuildpacks/builder:base"
+# Remove the buildpacks builder since we're using Dockerfile
+# [build]
+#   builder = "paketobuildpacks/builder:base"
 
 [env]
   PORT = "8080"
