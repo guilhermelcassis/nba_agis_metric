@@ -412,4 +412,8 @@ def player_details(player_name, game_date):
                              players=None)
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    # For local development
+    app.run(debug=True)
+else:
+    # For production with gunicorn
+    app.config['DEBUG'] = False 
