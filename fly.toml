@@ -9,6 +9,8 @@ kill_timeout = 5
 
 [env]
   PORT = "8080"
+  FLASK_APP = "app.py"
+  FLASK_ENV = "production"
 
 [http_service]
   internal_port = 8080
@@ -17,6 +19,10 @@ kill_timeout = 5
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
+
+[[statics]]
+  guest_path = "/app/static"
+  url_prefix = "/static"
 
 [[vm]]
   cpu_kind = "shared"

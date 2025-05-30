@@ -149,7 +149,13 @@
                 </div>
             </div>
             
-            <div class="table-container">
+            <!-- Mobile swipe hint -->
+            <div class="swipe-hint d-md-none">
+                <i class="fas fa-hand-point-right"></i> Swipe to see all stats
+            </div>
+            
+            <!-- Traditional table view (hidden on mobile) -->
+            <div class="table-container mobile-hide-table">
                 <table class="data-table" id="performances-table">
                     <thead class="sticky-header">
                         <tr>
@@ -221,6 +227,67 @@
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Mobile card view (visible only on mobile) -->
+            <div class="mobile-card-view d-md-none" id="mobile-performances">
+                {% for player in players %}
+                <div class="player-mobile-card">
+                    <div class="player-mobile-card-header">
+                        <div>
+                            <h3 class="player-mobile-name">{{ player.PLAYER_NAME }}</h3>
+                            <div class="player-mobile-team">{{ player.MATCHUP }}</div>
+                        </div>
+                        <div class="player-mobile-highlight">
+                            <span class="player-mobile-stat-value">{{ "%.1f"|format(player.AGIS) }}</span>
+                            <div class="player-mobile-stat-label">AGIS</div>
+                        </div>
+                    </div>
+                    
+                    <div class="player-mobile-stats">
+                        <div class="player-mobile-stat">
+                            <div class="player-mobile-stat-value">{{ player.PTS }}</div>
+                            <div class="player-mobile-stat-label">PTS</div>
+                        </div>
+                        <div class="player-mobile-stat">
+                            <div class="player-mobile-stat-value">{{ player.REB }}</div>
+                            <div class="player-mobile-stat-label">REB</div>
+                        </div>
+                        <div class="player-mobile-stat">
+                            <div class="player-mobile-stat-value">{{ player.AST }}</div>
+                            <div class="player-mobile-stat-label">AST</div>
+                        </div>
+                        <div class="player-mobile-stat">
+                            <div class="player-mobile-stat-value">{{ player.STL }}</div>
+                            <div class="player-mobile-stat-label">STL</div>
+                        </div>
+                        <div class="player-mobile-stat">
+                            <div class="player-mobile-stat-value">{{ player.BLK }}</div>
+                            <div class="player-mobile-stat-label">BLK</div>
+                        </div>
+                        <div class="player-mobile-stat">
+                            <div class="player-mobile-stat-value">{{ "%.1f"|format(player.EFF) }}</div>
+                            <div class="player-mobile-stat-label">EFF</div>
+                        </div>
+                    </div>
+                    
+                    <div class="player-mobile-footer">
+                        <div class="player-mobile-date">{{ player.GAME_DATE }}</div>
+                        <div class="player-mobile-matchup">{{ player.OPP_RECORD }}</div>
+                    </div>
+                    
+                    <a href="/player/{{ player.PLAYER_NAME }}/{{ player.GAME_DATE }}" class="mobile-player-link">
+                        View details <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                {% endfor %}
+                
+                <!-- Show only first few items initially -->
+                <div class="load-more-container" id="load-more-container">
+                    <button class="load-more-btn" id="load-more-btn">
+                        <i class="fas fa-plus-circle"></i> Load More
+                    </button>
+                </div>
+            </div>
         </div>
     {% else %}
         <div class="empty-state">
@@ -255,6 +322,51 @@
         
         // Initialize sortable tables
         initTableSort('performances-table');
+        
+        // Mobile card view handling
+        const mobileCards = document.querySelectorAll('.player-mobile-card');
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        const loadMoreContainer = document.getElementById('load-more-container');
+        
+        // Initially show only first 5 cards
+        const initialCardsToShow = 5;
+        let visibleCards = initialCardsToShow;
+        
+        // Hide cards beyond initial count
+        if (mobileCards.length > initialCardsToShow) {
+            for (let i = initialCardsToShow; i < mobileCards.length; i++) {
+                mobileCards[i].style.display = 'none';
+            }
+        } else {
+            // Hide load more button if not enough cards
+            if (loadMoreContainer) {
+                loadMoreContainer.style.display = 'none';
+            }
+        }
+        
+        // Load more functionality
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', function() {
+                // Show next batch of cards
+                const batchSize = 5;
+                const nextBatch = Math.min(visibleCards + batchSize, mobileCards.length);
+                
+                for (let i = visibleCards; i < nextBatch; i++) {
+                    mobileCards[i].style.display = 'block';
+                    // Add a small delay for animation effect
+                    setTimeout(() => {
+                        mobileCards[i].style.opacity = '1';
+                    }, (i - visibleCards) * 100);
+                }
+                
+                visibleCards = nextBatch;
+                
+                // Hide button when all cards are shown
+                if (visibleCards >= mobileCards.length) {
+                    loadMoreContainer.style.display = 'none';
+                }
+            });
+        }
         
         // Quick filters
         const quickFilters = document.querySelectorAll('.quick-filter-button');
