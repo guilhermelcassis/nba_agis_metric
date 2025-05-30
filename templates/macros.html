@@ -111,20 +111,48 @@
     <table class="data-table" id="gameHistoryTable">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Matchup</th>
-                <th>Opp. Record</th>
-                <th>MIN</th>
-                <th>PTS</th>
-                <th>REB</th>
-                <th>AST</th>
-                <th>STL</th>
-                <th>BLK</th>
-                <th>FG</th>
-                <th>3PT</th>
-                <th>FT</th>
-                <th>EFF</th>
-                <th>AGIS</th>
+                <th class="sortable" data-sort="date">
+                    <span class="column-label">Date</span>
+                </th>
+                <th class="sortable" data-sort="string">
+                    <span class="column-label">Matchup</span>
+                </th>
+                <th class="sortable" data-sort="string">
+                    <span class="column-label">Opp. Record</span>
+                </th>
+                <th class="sortable" data-sort="time">
+                    <span class="column-label">MIN</span>
+                </th>
+                <th class="sortable" data-sort="int">
+                    <span class="column-label">PTS</span>
+                </th>
+                <th class="sortable" data-sort="int">
+                    <span class="column-label">REB</span>
+                </th>
+                <th class="sortable" data-sort="int">
+                    <span class="column-label">AST</span>
+                </th>
+                <th class="sortable" data-sort="int">
+                    <span class="column-label">STL</span>
+                </th>
+                <th class="sortable" data-sort="int">
+                    <span class="column-label">BLK</span>
+                </th>
+                <th class="sortable" data-sort="string">
+                    <span class="column-label">FG</span>
+                </th>
+                <th class="sortable" data-sort="string">
+                    <span class="column-label">3PT</span>
+                </th>
+                <th class="sortable" data-sort="string">
+                    <span class="column-label">FT</span>
+                </th>
+                <th class="sortable" data-sort="float">
+                    <span class="column-label">EFF</span>
+                </th>
+                <th class="sortable" data-sort="float">
+                    <span class="column-label">AGIS</span>
+                </th>
             </tr>
         </thead>
         <tbody>

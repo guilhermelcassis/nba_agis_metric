@@ -1,31 +1,175 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
+{% block title %}NBA Game Performances | Analytics Hub{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
 {% endblock %}
 
 {% block content %}
-{{ macros.date_selector(start_date, end_date) }}
-
-{% if players %}
-    {{ macros.player_table(players) }}
-{% else %}
-    <div class="no-games">
-        <h2>{{ message }}</h2>
+<!-- Game performances dashboard header -->
+<div class="stats-dashboard">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="stats-header">
+                    <h1>Game Performances <span class="season-badge">2024-25</span></h1>
+                    <p class="dashboard-subtitle">Track the most impactful NBA performances with AGIS metrics</p>
+                </div>
+            </div>
+        </div>
     </div>
-{% endif %}
+</div>
+
+<div class="container">
+    <!-- Enhanced date selector with calendar icon -->
+    <div class="card-section">
+        <div class="section-title">
+            <h2><i class="fas fa-calendar-alt"></i> Select Date Range</h2>
+        </div>
+        
+        <form method="GET" action="/" class="row g-3">
+            <div class="col-md-5">
+                <div class="date-field">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-calendar input-icon"></i>
+                        <input type="text" class="form-control datepicker" id="start_date" name="start_date" 
+                              value="{{ start_date }}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="date-field">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <div class="input-icon-wrapper">
+                        <i class="fas fa-calendar input-icon"></i>
+                        <input type="text" class="form-control datepicker" id="end_date" name="end_date" 
+                              value="{{ end_date }}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Search Games
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Player performances table or no games message -->
+    {% if players %}
+        <div class="card-section">
+            <div class="table-header">
+                <h2><i class="fas fa-trophy"></i> Top Player Performances</h2>
+                <div class="performance-counter">
+                    <span class="counter-badge">{{ players|length }}</span> performances found
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="performances-table">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="string">
+                                <span class="column-label">Player</span>
+                            </th>
+                            <th class="sortable" data-sort="date">
+                                <span class="column-label">Date</span>
+                            </th>
+                            <th class="sortable" data-sort="string">
+                                <span class="column-label">Matchup</span>
+                            </th>
+                            <th class="sortable" data-sort="string">
+                                <span class="column-label">Opponent Record</span>
+                            </th>
+                            <th class="sortable" data-sort="time">
+                                <span class="column-label">Minutes</span>
+                            </th>
+                            <th class="sortable" data-sort="int">
+                                <span class="column-label">PTS</span>
+                            </th>
+                            <th class="sortable" data-sort="int">
+                                <span class="column-label">REB</span>
+                            </th>
+                            <th class="sortable" data-sort="int">
+                                <span class="column-label">AST</span>
+                            </th>
+                            <th class="sortable" data-sort="int">
+                                <span class="column-label">STL</span>
+                            </th>
+                            <th class="sortable" data-sort="int">
+                                <span class="column-label">BLK</span>
+                            </th>
+                            <th class="sortable" data-sort="float">
+                                <span class="column-label">EFF</span>
+                            </th>
+                            <th class="sortable" data-sort="float">
+                                <span class="column-label">AGIS</span>
+                            </th>
+                            <th class="sortable" data-sort="int">
+                                <span class="column-label">Salary</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in players %}
+                        <tr>
+                            <td class="player-name">
+                                <a href="/player/{{ player.PLAYER_NAME }}/{{ player.GAME_DATE }}" class="player-link">
+                                    {{ player.PLAYER_NAME }}
+                                </a>
+                            </td>
+                            <td>{{ player.GAME_DATE }}</td>
+                            <td>{{ player.MATCHUP }}</td>
+                            <td>{{ player.OPP_RECORD }}</td>
+                            <td>{{ player.MIN_SEC }}</td>
+                            <td>{{ player.PTS }}</td>
+                            <td>{{ player.REB }}</td>
+                            <td>{{ player.AST }}</td>
+                            <td>{{ player.STL }}</td>
+                            <td>{{ player.BLK }}</td>
+                            <td class="{% if player.EFF > 40 %}efficiency-high{% elif player.EFF > 25 %}efficiency-medium{% else %}efficiency-low{% endif %}">
+                                {{ "%.2f"|format(player.EFF) }}
+                            </td>
+                            <td class="agis-score">{{ "%.2f"|format(player.AGIS) }}</td>
+                            <td class="salary">{{ player.SALARY }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="fas fa-basketball"></i>
+            </div>
+            <h2>{{ message }}</h2>
+            <p>Try selecting a different date range to view game performances.</p>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date picker
         flatpickr(".datepicker", {
             dateFormat: "Y-m-d",
             maxDate: "today",
             theme: "dark"
         });
+        
+        // Initialize table sorting if table exists
+        if (document.getElementById('performances-table')) {
+            initTableSort('performances-table');
+        }
     });
 </script>
 {% endblock %} 

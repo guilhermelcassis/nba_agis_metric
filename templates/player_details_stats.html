@@ -1,101 +1,230 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
+{% block title %}{{ player.player_name }} - Season Stats | NBA Analytics Hub{% endblock %}
+
 {% block content %}
-<div class="header">
-    <h1>{{ player.player_name }}</h1>
-    <p>{{ player.team_name }} | {{ player.position }}</p>
-</div>
-
-<!-- Player Summary -->
-<div class="card-section">
-    <div class="section-title">
-        <h2>Player Summary</h2>
-    </div>
-    
-    <div class="summary-row">
-        {{ macros.summary_box(player.points, "Points") }}
-        {{ macros.summary_box(player.rebounds, "Rebounds") }}
-        {{ macros.summary_box(player.assists, "Assists") }}
-        {{ macros.summary_box(player.steals, "Steals") }}
-        {{ macros.summary_box(player.blocks, "Blocks") }}
-    </div>
-</div>
-
-<!-- Player Details -->
-<div class="card-section">
-    <div class="player-info-grid">
-        <div class="context-grid">
-            <h3 class="section-heading">Personal Info</h3>
-            {{ macros.context_item("Age", player.age) }}
-            {{ macros.context_item("Height", player.height) }}
-            {{ macros.context_item("Weight", player.weight) }}
-            {{ macros.context_item("Country", player.country) }}
+<!-- Player Profile Header -->
+<div class="player-header">
+    <div class="container">
+        <div class="player-banner">
+            <div class="player-info">
+                <h1>{{ player.player_name }}</h1>
+                <div class="game-info">
+                    <span class="player-team">{{ player.team_name }}</span>
+                    <span class="player-position">{{ player.position }}</span>
+                </div>
+                <div class="player-season">
+                    <span class="season-label">2024-25 Season</span>
+                </div>
+            </div>
+            <div class="player-metrics">
+                <div class="metric-badge">
+                    <div class="badge-value">{{ player.games_played }}</div>
+                    <div class="badge-label">Games</div>
+                </div>
+                <div class="metric-badge">
+                    <div class="badge-value">{{ "%.1f"|format(player.agis_per_game) }}</div>
+                    <div class="badge-label">AGIS/G</div>
+                </div>
+                <div class="metric-badge highlight">
+                    <div class="badge-value">{{ "%.1f"|format(player.agis_score) }}</div>
+                    <div class="badge-label">AGIS</div>
+                </div>
+            </div>
         </div>
         
-        <div class="context-grid">
-            <h3 class="section-heading">Career Info</h3>
-            {{ macros.context_item("Experience", player.seasons_exp ~ " years") }}
-            {{ macros.context_item("College", player.college) }}
-            {{ macros.context_item("Draft", player.draft_year ~ " (Rd " ~ player.draft_round ~ ", Pick " ~ player.draft_number ~ ")") }}
-            {{ macros.context_item("Jersey", "#" ~ player.jersey) }}
+        <div class="breadcrumb-nav">
+            <a href="/player-stats" class="breadcrumb-link">
+                <i class="fas fa-chart-line"></i> Season Stats
+            </a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">{{ player.player_name }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Player Information Column -->
+        <div class="col-lg-4">
+            <!-- Player Details Card -->
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-user"></i> Player Profile</h2>
+                </div>
+                
+                <div class="player-card">
+                    <div class="profile-section">
+                        <h3 class="profile-heading">Personal Info</h3>
+                        <div class="profile-grid">
+                            {{ macros.context_item("Age", player.age) }}
+                            {{ macros.context_item("Height", player.height) }}
+                            {{ macros.context_item("Weight", player.weight) }}
+                            {{ macros.context_item("Country", player.country) }}
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3 class="profile-heading">Career Info</h3>
+                        <div class="profile-grid">
+                            {{ macros.context_item("Experience", player.seasons_exp ~ " years") }}
+                            {{ macros.context_item("College", player.college) }}
+                            {{ macros.context_item("Draft", player.draft_year ~ " (Rd " ~ player.draft_round ~ ", Pick " ~ player.draft_number ~ ")") }}
+                            {{ macros.context_item("Jersey", "#" ~ player.jersey) }}
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3 class="profile-heading">Financial</h3>
+                        <div class="profile-grid">
+                            {{ macros.context_item_salary("Salary (24-25)", "$" ~ "{:,}".format(player.salary|int)) }}
+                            {{ macros.context_item("$/AGIS", "<span class='salary-per-agis'>" ~ ("%.1f"|format(player.salary_per_agis)) ~ "</span>") }}
+                            {{ macros.context_item("$/AGIS/Game", "<span class='salary-agis-per-game'>" ~ ("%.1f"|format(player.salary_agis_per_game)) ~ "</span>") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Value Metrics Explainer -->
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-question-circle"></i> Value Metrics</h2>
+                </div>
+                
+                <div class="explainer-box">
+                    <div class="explainer-item">
+                        <div class="explainer-icon salary-per-agis-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="explainer-content">
+                            <h4>$/AGIS</h4>
+                            <p>Shows how much a team is paying per unit of player impact (Salary ÷ AGIS)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="explainer-item">
+                        <div class="explainer-icon salary-agis-per-game-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="explainer-content">
+                            <h4>$/AGIS/G</h4>
+                            <p>Calculated as (Salary × Games) ÷ AGIS². This value metric rewards consistent high performance across more games. Lower values indicate better contract efficiency relative to sustained impact.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <div class="context-grid">
-            <h3 class="section-heading">Season Stats</h3>
-            {{ macros.context_item("Games Played", player.games_played) }}
-            {{ macros.context_item("Games Started", player.games_started) }}
-            {{ macros.context_item("Minutes", player.minutes) }}
-            {{ macros.context_item("Efficiency", player.efficiency) }}
+        <!-- Performance Stats Column -->
+        <div class="col-lg-8">
+            <!-- Season Statistics Overview -->
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-chart-bar"></i> Season Overview</h2>
+                </div>
+                
+                <div class="summary-row">
+                    {{ macros.summary_box(player.points, "Points") }}
+                    {{ macros.summary_box(player.rebounds, "Rebounds") }}
+                    {{ macros.summary_box(player.assists, "Assists") }}
+                    {{ macros.summary_box(player.steals, "Steals") }}
+                    {{ macros.summary_box(player.blocks, "Blocks") }}
+                </div>
+                
+                <div class="stats-detail">
+                    <div class="stats-grid">
+                        <div class="stats-item">
+                            <div class="stats-label">Games Played</div>
+                            <div class="stats-value">{{ player.games_played }}</div>
+                        </div>
+                        <div class="stats-item">
+                            <div class="stats-label">Games Started</div>
+                            <div class="stats-value">{{ player.games_started }}</div>
+                        </div>
+                        <div class="stats-item">
+                            <div class="stats-label">Minutes</div>
+                            <div class="stats-value">{{ player.minutes }}</div>
+                        </div>
+                        <div class="stats-item">
+                            <div class="stats-label">Efficiency</div>
+                            <div class="stats-value efficiency-{{ 'high' if player.efficiency > 2500 else 'medium' if player.efficiency > 1500 else 'low' }}">
+                                {{ player.efficiency }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Shooting Percentages -->
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-bullseye"></i> Shooting</h2>
+                </div>
+                
+                <div class="stat-row">
+                    {{ macros.shooting_stat(0, 0, player.fg_pct, "Field Goal %", [0.43, 0.5]) }}
+                    {{ macros.shooting_stat(0, 0, player.fg3_pct, "3-Point %", [0.33, 0.4]) }}
+                    {{ macros.shooting_stat(0, 0, player.ft_pct, "Free Throw %", [0.75, 0.85]) }}
+                </div>
+            </div>
+            
+            <!-- Performance Metrics -->
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-tachometer-alt"></i> Performance Metrics</h2>
+                </div>
+                
+                <div class="metric-cards">
+                    <div class="metric-card">
+                        <div class="metric-card-header efficiency-{{ 'high' if player.efficiency > 2500 else 'medium' if player.efficiency > 1500 else 'low' }}">
+                            <i class="fas fa-chart-line"></i> Efficiency
+                        </div>
+                        <div class="metric-card-value">{{ player.efficiency }}</div>
+                        <div class="metric-card-desc">Overall statistical performance</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-card-header agis-score-header">
+                            <i class="fas fa-star"></i> AGIS Score
+                        </div>
+                        <div class="metric-card-value agis-score">{{ "%.1f"|format(player.agis_score) }}</div>
+                        <div class="metric-card-desc">Advanced Game Impact Score (total)</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-card-header agis-per-game-header">
+                            <i class="fas fa-bolt"></i> AGIS Per Game
+                        </div>
+                        <div class="metric-card-value agis-per-game">{{ "%.1f"|format(player.agis_per_game) }}</div>
+                        <div class="metric-card-desc">Average impact per game</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-card-header salary-agis-per-game-header">
+                            <i class="fas fa-balance-scale"></i> $/AGIS/Game
+                        </div>
+                        <div class="metric-card-value salary-agis-per-game">{{ "%.1f"|format(player.salary_agis_per_game) }}</div>
+                        <div class="metric-card-desc">Value metric (lower is better)</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="context-grid">
-            <h3 class="section-heading">Financial</h3>
-            {{ macros.context_item_salary("Salary (24-25)", "$" ~ "{:,}".format(player.salary|int)) }}
-            {{ macros.context_item("AGIS/Game", "<span class='agis-per-game'>" ~ ("%.1f"|format(player.agis_per_game)) ~ "</span>") }}
-            {{ macros.context_item("$/AGIS", "<span class='salary-per-agis'>" ~ ("%.1f"|format(player.salary_per_agis)) ~ "</span>") }}
-            {{ macros.context_item("$/AGIS/Game", "<span class='salary-agis-per-game'>" ~ ("%.1f"|format(player.salary_agis_per_game)) ~ "</span>") }}
-        </div>
-    </div>
-    
-    <div style="margin-top: 15px; padding: 10px; background-color: #333; border-radius: 5px; font-size: 0.9em;">
-        <p style="margin-bottom: 5px;"><strong>Understanding Value Metrics:</strong></p>
-        <ul style="margin-bottom: 0; padding-left: 20px;">
-            <li><span class="salary-per-agis">$/AGIS</span> - Shows how much a team is paying per unit of player impact (Salary ÷ AGIS)</li>
-            <li><span class="salary-agis-per-game">$/AGIS/G</span> - Calculated as (Salary × Games) ÷ AGIS². This value metric rewards consistent high performance across more games. Lower values indicate better contract efficiency relative to sustained impact.</li>
-        </ul>
     </div>
 </div>
+{% endblock %}
 
-<!-- Shooting Percentages -->
-<div class="card-section">
-    <div class="section-title">
-        <h2>Shooting Percentages</h2>
-    </div>
-    
-    <div class="stat-row">
-        {{ macros.shooting_stat(0, 0, player.fg_pct, "Field Goal %", [0.43, 0.5]) }}
-        {{ macros.shooting_stat(0, 0, player.fg3_pct, "3-Point %", [0.33, 0.4]) }}
-        {{ macros.shooting_stat(0, 0, player.ft_pct, "Free Throw %", [0.75, 0.85]) }}
-    </div>
-</div>
-
-<!-- Efficiency Metrics -->
-<div class="card-section">
-    <div class="section-title">
-        <h2>Performance Metrics</h2>
-    </div>
-    
-    <div class="stat-row">
-        {{ macros.stat_item(player.efficiency, "Efficiency", "efficiency-" ~ ("high" if player.efficiency > 2500 else "medium" if player.efficiency > 1500 else "low")) }}
-        {{ macros.stat_item("%.1f"|format(player.agis_score), "AGIS Score", "agis-score") }}
-        {{ macros.stat_item("%.1f"|format(player.agis_per_game), "AGIS Per Game", "agis-per-game") }}
-        {{ macros.stat_item("%.1f"|format(player.salary_agis_per_game), "$/AGIS/Game", "salary-agis-per-game") }}
-    </div>
-</div>
-
-<!-- Back Button -->
-<div class="mt-4">
-    <a href="/player-stats" class="nav-link">← Back to Player Stats</a>
-</div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize any sortable tables if present
+        const tables = document.querySelectorAll('.data-table');
+        tables.forEach(table => {
+            if (table.id) {
+                initTableSort(table.id);
+            }
+        });
+    });
+</script>
 {% endblock %} 

@@ -1,98 +1,237 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
-{% block title %}{{ player.PLAYER_NAME }} - Game Details{% endblock %}
-
-{% block navigation %}
-<a href="/" class="nav-link">← Back to All Players</a>
-{% endblock %}
-
-{% block header %}
-<div class="header">
-    <h1>{{ player.PLAYER_NAME }}</h1>
-    <p>{{ player.GAME_DATE }} - {{ player.MATCHUP }}</p>
-</div>
-{% endblock %}
+{% block title %}{{ player.PLAYER_NAME }} - Game Performance | NBA Analytics Hub{% endblock %}
 
 {% block content %}
-<div class="card-section">
-    <h2 class="section-heading">Player Information</h2>
-    <div class="player-info-grid">
-        {% if player_db %}
-            {{ macros.context_item("Position", player_db.position) }}
-            {{ macros.context_item("Age", player_db.age) }}
-            {{ macros.context_item("Height", player_db.height) }}
-            {{ macros.context_item("Weight", player_db.weight ~ " lbs") if player_db.weight else macros.context_item("Weight", "N/A") }}
-            {{ macros.context_item("Team", player_db.team_name) }}
-            {{ macros.context_item("Jersey #", player_db.jersey) }}
-            {{ macros.context_item_salary("2024-25 Salary", player_db.salary) }}
-            {{ macros.context_item("Country", player_db.country) }}
-            {{ macros.context_item("Experience", player_db.seasons_exp ~ " years") if player_db.seasons_exp else macros.context_item("Experience", "N/A") }}
-            {{ macros.context_item("College", player_db.college) if player_db.college else macros.context_item("College", "N/A") }}
-            {% if player_db.draft_year and player_db.draft_year != '' %}
-                {% set draft_info = "Round " ~ player_db.draft_round ~ ", Pick " ~ player_db.draft_number ~ " (" ~ player_db.draft_year ~ ")" %}
-                {{ macros.context_item("Draft", draft_info) }}
-            {% else %}
-                {{ macros.context_item("Draft", "Undrafted") }}
-            {% endif %}
-        {% else %}
-            {{ macros.context_item("Name", player.PLAYER_NAME) }}
-            {{ macros.context_item_salary("2024-25 Salary", player.SALARY) }}
-        {% endif %}
+<!-- Player Game Performance Header -->
+<div class="player-header">
+    <div class="container">
+        <div class="player-banner">
+            <div class="player-info">
+                <h1>{{ player.PLAYER_NAME }}</h1>
+                <div class="game-info">
+                    <span class="game-date">{{ player.GAME_DATE }}</span>
+                    <span class="game-matchup">{{ player.MATCHUP }}</span>
+                </div>
+                <div class="game-result">
+                    <span class="opp-record">{{ player.OPP_RECORD }}</span>
+                </div>
+            </div>
+            <div class="player-metrics">
+                <div class="metric-badge">
+                    <div class="badge-value">{{ player.PTS }}</div>
+                    <div class="badge-label">PTS</div>
+                </div>
+                <div class="metric-badge">
+                    <div class="badge-value">{{ "%.2f"|format(player.EFF) }}</div>
+                    <div class="badge-label">EFF</div>
+                </div>
+                <div class="metric-badge highlight">
+                    <div class="badge-value">{{ "%.2f"|format(player.AGIS) }}</div>
+                    <div class="badge-label">AGIS</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="breadcrumb-nav">
+            <a href="/" class="breadcrumb-link">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">Player Game Details</span>
+        </div>
     </div>
 </div>
 
-<div class="card-section">
-    <h2 class="section-heading">Game History</h2>
-    {{ macros.player_game_history(all_games, selected_date) }}
-</div>
-
-<div class="section-title">
-    <h2>Selected Game Details: {{ player.GAME_DATE }}</h2>
-</div>
-
-<div class="card-section">
-    <h2 class="section-heading">Game Context</h2>
-    <div class="context-grid">
-        {{ macros.context_item("Opponent", player.MATCHUP) }}
-        {{ macros.context_item("Opponent Record", player.OPP_RECORD) }}
-        {{ macros.context_item("Minutes Played", player.MIN_SEC) }}
+<div class="container">
+    <div class="row">
+        <!-- Player Information Column -->
+        <div class="col-lg-4">
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-user"></i> Player Profile</h2>
+                </div>
+                
+                <div class="player-card">
+                    {% if player_db %}
+                        <div class="profile-section">
+                            <h3 class="profile-heading">Personal</h3>
+                            <div class="profile-grid">
+                                {{ macros.context_item("Position", player_db.position) }}
+                                {{ macros.context_item("Age", player_db.age) }}
+                                {{ macros.context_item("Height", player_db.height) }}
+                                {{ macros.context_item("Weight", player_db.weight ~ " lbs") if player_db.weight else macros.context_item("Weight", "N/A") }}
+                                {{ macros.context_item("Country", player_db.country) }}
+                            </div>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h3 class="profile-heading">Team Info</h3>
+                            <div class="profile-grid">
+                                {{ macros.context_item("Team", player_db.team_name) }}
+                                {{ macros.context_item("Jersey #", player_db.jersey) }}
+                                {{ macros.context_item_salary("2024-25 Salary", player_db.salary) }}
+                            </div>
+                        </div>
+                        
+                        <div class="profile-section">
+                            <h3 class="profile-heading">Career</h3>
+                            <div class="profile-grid">
+                                {{ macros.context_item("Experience", player_db.seasons_exp ~ " years") if player_db.seasons_exp else macros.context_item("Experience", "N/A") }}
+                                {{ macros.context_item("College", player_db.college) if player_db.college else macros.context_item("College", "N/A") }}
+                                {% if player_db.draft_year and player_db.draft_year != '' %}
+                                    {% set draft_info = "Round " ~ player_db.draft_round ~ ", Pick " ~ player_db.draft_number ~ " (" ~ player_db.draft_year ~ ")" %}
+                                    {{ macros.context_item("Draft", draft_info) }}
+                                {% else %}
+                                    {{ macros.context_item("Draft", "Undrafted") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="profile-section">
+                            <div class="profile-grid">
+                                {{ macros.context_item("Name", player.PLAYER_NAME) }}
+                                {{ macros.context_item_salary("2024-25 Salary", player.SALARY) }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Game Context Section -->
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-basketball"></i> Game Context</h2>
+                </div>
+                
+                <div class="context-grid">
+                    {{ macros.context_item("Matchup", player.MATCHUP) }}
+                    {{ macros.context_item("Opponent Record", player.OPP_RECORD) }}
+                    {{ macros.context_item("Minutes Played", player.MIN_SEC) }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Performance Details Column -->
+        <div class="col-lg-8">
+            <!-- Game Performance Breakdown -->
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-chart-bar"></i> Performance Breakdown</h2>
+                </div>
+                
+                <div class="performance-breakdown">
+                    <!-- Scoring & Shooting -->
+                    <div class="breakdown-section">
+                        <h3 class="breakdown-heading">Scoring</h3>
+                        <div class="stat-row">
+                            {{ macros.shooting_stat(player.FGM, player.FGA, player.FG_PCT, "Field Goals", [0.4, 0.5]) }}
+                            {{ macros.shooting_stat(player.FG3M, player.FG3A, player.FG3_PCT, "3-Pointers", [0.33, 0.4]) }}
+                            {{ macros.shooting_stat(player.FTM, player.FTA, player.FT_PCT, "Free Throws", [0.7, 0.8]) }}
+                        </div>
+                    </div>
+                    
+                    <!-- Box Score Stats -->
+                    <div class="breakdown-section">
+                        <h3 class="breakdown-heading">Box Score</h3>
+                        <div class="stat-row">
+                            {{ macros.stat_item(player.REB, "Rebounds") }}
+                            {{ macros.stat_item(player.AST, "Assists") }}
+                            {{ macros.stat_item(player.STL, "Steals") }}
+                            {{ macros.stat_item(player.BLK, "Blocks") }}
+                            {{ macros.stat_item(player.TOV, "Turnovers") }}
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Stats -->
+                    <div class="breakdown-section">
+                        <h3 class="breakdown-heading">Advanced</h3>
+                        <div class="stat-row">
+                            {{ macros.stat_item(player.OREB, "Off. Rebounds") }}
+                            {{ macros.stat_item(player.DREB, "Def. Rebounds") }}
+                            {{ macros.stat_item(player.PLUS_MINUS, "Plus/Minus") }}
+                            {{ macros.stat_item(player.PF, "Personal Fouls") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game History Section -->
+            <div class="card-section">
+                <div class="table-header">
+                    <h2><i class="fas fa-history"></i> Game History</h2>
+                    <div class="history-filter">
+                        <select class="form-control form-control-sm" id="game-filter">
+                            <option value="all">All Games</option>
+                            <option value="home">Home Games</option>
+                            <option value="away">Away Games</option>
+                        </select>
+                    </div>
+                </div>
+                
+                {{ macros.player_game_history(all_games, selected_date) }}
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
 
-<div class="summary-row">
-    {{ macros.summary_box(player.PTS, "Points") }}
-    {{ macros.summary_box("%.2f"|format(player.EFF), "Efficiency") }}
-    {{ macros.summary_box("%.2f"|format(player.AGIS), "AGIS Score") }}
-</div>
-
-<div class="card-section">
-    <h2 class="section-heading">Scoring Breakdown</h2>
-    <div class="stat-row">
-        {{ macros.shooting_stat(player.FGM, player.FGA, player.FG_PCT, "Field Goals", [0.4, 0.5]) }}
-        {{ macros.shooting_stat(player.FG3M, player.FG3A, player.FG3_PCT, "3-Pointers", [0.33, 0.4]) }}
-        {{ macros.shooting_stat(player.FTM, player.FTA, player.FT_PCT, "Free Throws", [0.7, 0.8]) }}
-    </div>
-</div>
-
-<div class="card-section">
-    <h2 class="section-heading">Key Stats</h2>
-    <div class="stat-row">
-        {{ macros.stat_item(player.REB, "Rebounds") }}
-        {{ macros.stat_item(player.AST, "Assists") }}
-        {{ macros.stat_item(player.STL, "Steals") }}
-        {{ macros.stat_item(player.BLK, "Blocks") }}
-        {{ macros.stat_item(player.TOV, "Turnovers") }}
-    </div>
-</div>
-
-<div class="card-section">
-    <h2 class="section-heading">Advanced Stats</h2>
-    <div class="stat-row">
-        {{ macros.stat_item(player.OREB, "Off. Rebounds") }}
-        {{ macros.stat_item(player.DREB, "Def. Rebounds") }}
-        {{ macros.stat_item(player.PLUS_MINUS, "Plus/Minus") }}
-        {{ macros.stat_item(player.PF, "Personal Fouls") }}
-    </div>
-</div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize table sorting
+        initTableSort('gameHistoryTable');
+        
+        // Setup game filter
+        const gameFilter = document.getElementById('game-filter');
+        if (gameFilter) {
+            gameFilter.addEventListener('change', function() {
+                const value = this.value;
+                const rows = document.querySelectorAll('#gameHistoryTable tbody tr');
+                
+                rows.forEach(row => {
+                    const matchup = row.querySelector('td:nth-child(2)').textContent;
+                    
+                    if (value === 'all') {
+                        row.style.display = '';
+                    } else if (value === 'home' && matchup.includes(' vs. ')) {
+                        row.style.display = '';
+                    } else if (value === 'away' && matchup.includes(' @ ')) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Add column-label spans to existing table headers
+        const gameHistoryTable = document.getElementById('gameHistoryTable');
+        if (gameHistoryTable) {
+            const headers = gameHistoryTable.querySelectorAll('thead th');
+            headers.forEach(header => {
+                const text = header.textContent.trim();
+                header.innerHTML = `<span class="column-label">${text}</span>`;
+                
+                // Add sortable class to all headers
+                if (!header.classList.contains('sortable')) {
+                    header.classList.add('sortable');
+                    
+                    // Add appropriate data-sort attribute based on content
+                    if (text === 'Date') {
+                        header.setAttribute('data-sort', 'date');
+                    } else if (['MIN', 'PTS', 'REB', 'AST', 'STL', 'BLK'].includes(text)) {
+                        header.setAttribute('data-sort', 'int');
+                    } else if (['EFF', 'AGIS'].includes(text) || text.includes('%')) {
+                        header.setAttribute('data-sort', 'float');
+                    } else {
+                        header.setAttribute('data-sort', 'string');
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %} 

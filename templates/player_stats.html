@@ -1,154 +1,241 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
+{% block title %}NBA Player Stats 2024-25 | Analytics Hub{% endblock %}
+
 {% block content %}
-<!-- Simple page title -->
-<div class="header compact-header">
-    <h1>NBA Player Stats 2024-25</h1>
+<!-- Page header with compact design -->
+<div class="stats-dashboard compact-dashboard">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="stats-header">
+                    <h1>NBA Player Statistics <span class="season-badge">2024-25</span></h1>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Compact layout with filters and key metrics side by side -->
-<div class="row">
-    <!-- Filter section - take 60% width on larger screens -->
-    <div class="col-lg-7">
-        <div class="card-section compact-card">
-            <div class="section-title compact-title">
-                <h2>Filter Players</h2>
-            </div>
-            
-            <form method="GET" action="/player-stats" class="compact-form">
-                <div class="row">
-                    <div class="col-md-3 mb-2">
-                        <label for="team" class="small-label">Team</label>
-                        <select name="team" id="team" class="form-control form-control-sm">
-                            <option value="">All Teams</option>
-                            {% for team in teams %}
-                            <option value="{{ team }}" {% if selected_team == team %}selected{% endif %}>{{ team }}</option>
-                            {% endfor %}
-                        </select>
+<!-- Main content area with filters and data -->
+<div class="container">
+    <!-- Filter section in horizontal layout above the table -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card-section filter-card compact-filter">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <div class="section-title mb-md-0 text-md-start">
+                            <h2><i class="fas fa-filter"></i> Filters</h2>
+                        </div>
                     </div>
-                    <div class="col-md-3 mb-2">
-                        <label for="position" class="small-label">Position</label>
-                        <select name="position" id="position" class="form-control form-control-sm">
-                            <option value="">All Positions</option>
-                            {% for pos in positions %}
-                            <option value="{{ pos }}" {% if selected_position == pos %}selected{% endif %}>{{ pos }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <label for="sort_by" class="small-label">Sort By</label>
-                        <select name="sort_by" id="sort_by" class="form-control form-control-sm">
-                            <option value="agis_score" {% if sort_by == 'agis_score' %}selected{% endif %}>AGIS Score</option>
-                            <option value="agis_per_game" {% if sort_by == 'agis_per_game' %}selected{% endif %}>AGIS Per Game</option>
-                            <option value="salary" {% if sort_by == 'salary' %}selected{% endif %}>Salary</option>
-                            <option value="points" {% if sort_by == 'points' %}selected{% endif %}>Points</option>
-                            <option value="rebounds" {% if sort_by == 'rebounds' %}selected{% endif %}>Rebounds</option>
-                            <option value="assists" {% if sort_by == 'assists' %}selected{% endif %}>Assists</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-2">
-                        <label for="direction" class="small-label">Direction</label>
-                        <select name="direction" id="direction" class="form-control form-control-sm">
-                            <option value="desc" {% if direction == 'desc' %}selected{% endif %}>Descending</option>
-                            <option value="asc" {% if direction == 'asc' %}selected{% endif %}>Ascending</option>
-                        </select>
-                    </div>
-                    <div class="col-12 mt-2">
-                        <button type="submit" class="btn btn-sm btn-primary" style="background-color: #ff6b6b; border: none;">
-                            Apply Filters
-                        </button>
+                    <div class="col-md-10">
+                        <form method="GET" action="/player-stats" class="filter-form-horizontal">
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label for="team" class="form-label compact-label">Team</label>
+                                    <div class="select-wrapper">
+                                        <select name="team" id="team" class="form-control form-control-sm">
+                                            <option value="">All Teams</option>
+                                            {% for team in teams %}
+                                            <option value="{{ team }}" {% if selected_team == team %}selected{% endif %}>{{ team }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="position" class="form-label compact-label">Position</label>
+                                    <div class="select-wrapper">
+                                        <select name="position" id="position" class="form-control form-control-sm">
+                                            <option value="">All Positions</option>
+                                            {% for pos in positions %}
+                                            <option value="{{ pos }}" {% if selected_position == pos %}selected{% endif %}>{{ pos }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="sort_by" class="form-label compact-label">Sort By</label>
+                                    <div class="select-wrapper">
+                                        <select name="sort_by" id="sort_by" class="form-control form-control-sm">
+                                            <option value="agis_score" {% if sort_by == 'agis_score' %}selected{% endif %}>AGIS Score</option>
+                                            <option value="agis_per_game" {% if sort_by == 'agis_per_game' %}selected{% endif %}>AGIS Per Game</option>
+                                            <option value="salary" {% if sort_by == 'salary' %}selected{% endif %}>Salary</option>
+                                            <option value="points" {% if sort_by == 'points' %}selected{% endif %}>Points</option>
+                                            <option value="rebounds" {% if sort_by == 'rebounds' %}selected{% endif %}>Rebounds</option>
+                                            <option value="assists" {% if sort_by == 'assists' %}selected{% endif %}>Assists</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label compact-label">Direction</label>
+                                    <div class="radio-buttons">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="direction" id="direction_desc" value="desc" {% if direction == 'desc' %}checked{% endif %}>
+                                            <label class="form-check-label" for="direction_desc">Descending</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="direction" id="direction_asc" value="asc" {% if direction == 'asc' %}checked{% endif %}>
+                                            <label class="form-check-label" for="direction_asc">Ascending</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-12 text-end">
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-search"></i> Apply
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Key metrics section - take 40% width on larger screens -->
-    <div class="col-lg-5">
-        <div class="card-section compact-card">
-            <div class="section-title compact-title">
-                <h2>Key Metrics</h2>
-            </div>
-            
-            <div class="metrics-container">
-                <ul class="compact-metrics">
-                    <li><span class="agis-score">AGIS</span> - Advanced Game Impact Score (total for season)</li>
-                    <li><span class="agis-per-game">AGIS/G</span> - AGIS per Game (average impact per game)</li>
-                    <li><span class="salary-per-agis">$/AGIS</span> - Dollars per AGIS point (cost per impact unit)</li>
-                    <li><span class="salary-agis-per-game">$/AGIS/G</span> - (Salary × Games) ÷ AGIS² - Value metric that rewards sustained high performance</li>
-                </ul>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Player Statistics Table -->
-<div class="card-section">
-    <div class="section-title">
-        <h2>Player Statistics</h2>
-        <button id="download-csv" class="btn btn-sm btn-success">Download CSV</button>
+    
+    <!-- Player Statistics Table - full width -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card-section">
+                <div class="table-header">
+                    <h2><i class="fas fa-basketball"></i> Player Statistics</h2>
+                    <button id="download-csv" class="btn btn-success">
+                        Download CSV
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="player-stats-table">
+                        <thead class="sticky-header">
+                            <tr>
+                                <th class="sortable" data-sort="string">
+                                    <span class="column-label">Player</span>
+                                </th>
+                                <th class="sortable" data-sort="string">
+                                    <span class="column-label">Team</span>
+                                </th>
+                                <th class="sortable" data-sort="string">
+                                    <span class="column-label">Pos</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="agis_score">
+                                    <span class="column-label" title="Advanced Game Impact Score - Primary metric for player impact">AGIS</span>
+                                </th>
+                                <th class="sortable" data-sort="int" data-column="salary">
+                                    <span class="column-label">Salary</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="salary_agis_per_game">
+                                    <span class="column-label" title="Salary efficiency metric - Lower is better (Salary × Games) ÷ AGIS²">$/AGIS/G</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="points">
+                                    <span class="column-label">PTS</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="rebounds">
+                                    <span class="column-label">REB</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="assists">
+                                    <span class="column-label">AST</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="steals">
+                                    <span class="column-label">STL</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="blocks">
+                                    <span class="column-label">BLK</span>
+                                </th>
+                                <th class="sortable" data-sort="float" data-column="efficiency">
+                                    <span class="column-label">EFF</span>
+                                </th>
+                                <th class="sortable" data-sort="int" data-column="games_played">
+                                    <span class="column-label">GP</span>
+                                </th>
+                                <th class="sortable" data-sort="int" data-column="minutes">
+                                    <span class="column-label">MIN</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in players %}
+                            <tr>
+                                <td class="player-name">
+                                    <a href="/player-details/{{ player.player_id }}" class="player-link">
+                                        {{ player.player_name }}
+                                    </a>
+                                </td>
+                                <td>{{ player.team_abbreviation }}</td>
+                                <td>{{ player.position }}</td>
+                                <td class="agis-score highlight-cell">{{ "%.1f"|format(player.agis_score) }}</td>
+                                <td class="salary">${{ "{:,}".format(player.salary|int) }}</td>
+                                <td class="salary-agis-per-game highlight-cell">{{ "%.1f"|format(player.salary_agis_per_game) }}</td>
+                                <td>{{ player.points }}</td>
+                                <td>{{ player.rebounds }}</td>
+                                <td>{{ player.assists }}</td>
+                                <td>{{ player.steals }}</td>
+                                <td>{{ player.blocks }}</td>
+                                <td>{{ "%.1f"|format(player.efficiency) }}</td>
+                                <td>{{ player.games_played }}</td>
+                                <td>{{ player.minutes }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <div class="table-container">
-        <table class="data-table sortable" id="player-stats-table">
-            <thead>
-                <tr>
-                    <th data-sort="string">Player</th>
-                    <th data-sort="string">Team</th>
-                    <th data-sort="string">Pos</th>
-                    <th data-sort="int" data-column="games_played">GP</th>
-                    <th data-sort="int" data-column="games_started">GS</th>
-                    <th data-sort="int" data-column="minutes">MIN</th>
-                    <th data-sort="float" data-column="points">PTS</th>
-                    <th data-sort="float" data-column="rebounds">REB</th>
-                    <th data-sort="float" data-column="assists">AST</th>
-                    <th data-sort="float" data-column="steals">STL</th>
-                    <th data-sort="float" data-column="blocks">BLK</th>
-                    <th data-sort="float" data-column="fg_pct">FG%</th>
-                    <th data-sort="float" data-column="fg3_pct">3P%</th>
-                    <th data-sort="float" data-column="ft_pct">FT%</th>
-                    <th data-sort="float" data-column="efficiency">EFF</th>
-                    <th data-sort="float" data-column="agis_score">AGIS</th>
-                    <th data-sort="float" data-column="agis_per_game">AGIS/G</th>
-                    <th data-sort="int" data-column="salary">Salary ($)</th>
-                    <th>$/AGIS</th>
-                    <th>$/AGIS/G</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for player in players %}
-                <tr>
-                    <td class="player-name">
-                        <a href="/player-details/{{ player.player_id }}" class="player-link">
-                            {{ player.player_name }}
-                        </a>
-                    </td>
-                    <td>{{ player.team_abbreviation }}</td>
-                    <td>{{ player.position }}</td>
-                    <td>{{ player.games_played }}</td>
-                    <td>{{ player.games_started }}</td>
-                    <td>{{ player.minutes }}</td>
-                    <td>{{ player.points }}</td>
-                    <td>{{ player.rebounds }}</td>
-                    <td>{{ player.assists }}</td>
-                    <td>{{ player.steals }}</td>
-                    <td>{{ player.blocks }}</td>
-                    <td>{{ "%.3f"|format(player.fg_pct) }}</td>
-                    <td>{{ "%.3f"|format(player.fg3_pct) }}</td>
-                    <td>{{ "%.3f"|format(player.ft_pct) }}</td>
-                    <td class="{% if player.efficiency > 2500 %}efficiency-high{% elif player.efficiency > 1500 %}efficiency-medium{% else %}efficiency-low{% endif %}">
-                        {{ "%.1f"|format(player.efficiency) }}
-                    </td>
-                    <td class="agis-score">{{ "%.1f"|format(player.agis_score) }}</td>
-                    <td class="agis-per-game">{{ "%.1f"|format(player.agis_per_game) }}</td>
-                    <td class="salary">${{ "{:,}".format(player.salary|int) }}</td>
-                    <td class="salary-per-agis">{{ "%.1f"|format(player.salary_per_agis) }}</td>
-                    <td class="salary-agis-per-game">{{ "%.1f"|format(player.salary_agis_per_game) }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Metrics explainer section - moved to bottom -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-info-circle"></i> Understanding Metrics</h2>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6 mb-3 mb-lg-0">
+                        <div class="metric-item">
+                            <div class="metric-icon agis-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h4>AGIS (Advanced Game Impact Score)</h4>
+                                <p>The primary metric for evaluating player impact. Combines statistical performance with game context for a comprehensive measure of player value. Higher scores indicate greater positive impact.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="metric-item">
+                            <div class="metric-icon salary-agis-per-game-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h4>$/AGIS/G (Dollars per AGIS per Game)</h4>
+                                <p>Measures contract efficiency relative to player impact. Calculated as (Salary × Games) ÷ AGIS². <strong>Lower values</strong> indicate better financial value.</p>
+                                
+                                <div class="value-categories-container">
+                                    <ul class="value-categories">
+                                        <li class="elite-value">
+                                            <span class="indicator">⭐⭐⭐</span> 
+                                            <span>Below 100: Extremely valuable players</span>
+                                        </li>
+                                        <li class="good-value">
+                                            <span class="indicator">⭐</span> 
+                                            <span>100-200: Good value contracts</span>
+                                        </li>
+                                        <li class="trade-value">
+                                            <span class="indicator">↻</span> 
+                                            <span>Above 200: Potential trade candidates</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -157,14 +244,92 @@
 <script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the table sorter
+        // Initialize table sorter
         initTableSort('player-stats-table');
+        
+        // Add value tier attributes to $/AGIS/G cells for color coding
+        addValueTiersToSalaryMetric();
+        
+        // Auto-sort by AGIS score (descending) on page load if no sort specified
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('sort_by')) {
+            // Get the AGIS score column header
+            const agisHeader = document.querySelector('th[data-column="agis_score"]');
+            if (agisHeader) {
+                // Trigger a click to sort by AGIS
+                setTimeout(() => {
+                    agisHeader.click();
+                    // If needed, click again to make it descending
+                    if (!agisHeader.classList.contains('sort-desc')) {
+                        agisHeader.click();
+                    }
+                    
+                    // Force browser to recalculate the sticky position
+                    document.querySelector('.table-container').scrollTop = 1;
+                    setTimeout(() => {
+                        document.querySelector('.table-container').scrollTop = 0;
+                    }, 10);
+                }, 100);
+            }
+        } else {
+            // Force browser to recalculate the sticky position
+            setTimeout(() => {
+                document.querySelector('.table-container').scrollTop = 1;
+                setTimeout(() => {
+                    document.querySelector('.table-container').scrollTop = 0;
+                }, 10);
+            }, 100);
+        }
         
         // Initialize CSV download
         document.getElementById('download-csv').addEventListener('click', function() {
             downloadTableAsCSV('player-stats-table', 'nba_player_stats.csv');
         });
+        
+        // Add hover effects to metric items
+        const metricItems = document.querySelectorAll('.metric-item');
+        metricItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.classList.add('metric-hover');
+            });
+            item.addEventListener('mouseleave', function() {
+                this.classList.remove('metric-hover');
+            });
+        });
     });
+    
+    // Function to add value tier attributes to $/AGIS/G cells
+    function addValueTiersToSalaryMetric() {
+        const table = document.getElementById('player-stats-table');
+        if (!table) return;
+        
+        // Get all $/AGIS/G cells
+        const cells = table.querySelectorAll('td.salary-agis-per-game');
+        if (cells.length === 0) return;
+        
+        // Add value categories based on thresholds
+        cells.forEach(cell => {
+            const value = parseFloat(cell.textContent);
+            
+            // Clear any existing class names or attributes
+            cell.removeAttribute('data-value-category');
+            
+            // Apply categories based on thresholds
+            if (value < 100) {
+                // Below 100 - Extremely valuable players
+                cell.setAttribute('data-value-category', 'elite');
+                cell.setAttribute('title', 'Extremely valuable player - Exceptional value for salary');
+            } else if (value <= 200) {
+                // 100-200 - Good value
+                cell.setAttribute('data-value-category', 'good');
+                cell.setAttribute('title', 'Good value player - Fair contract for performance');
+            } else {
+                // Above 200 - Trade candidate
+                cell.setAttribute('data-value-category', 'trade');
+                cell.setAttribute('title', 'Trade candidate - Consider trading or renegotiating contract');
+            }
+        });
+    }
     
     function downloadTableAsCSV(tableId, filename) {
         const table = document.getElementById(tableId);
@@ -212,4 +377,4 @@
         }
     }
 </script>
-{% endblock %} 
+{% endblock %}
