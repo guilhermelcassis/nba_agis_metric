@@ -15,8 +15,9 @@ function initTableSort(tableId) {
             const sortType = this.getAttribute('data-sort') || 'string';
             const columnName = this.getAttribute('data-column');
             
-            // Get the current sort direction
-            let sortDirection = this.classList.contains('sort-asc') ? 'desc' : 'asc';
+            // Get the current sort direction - MODIFIED to default to descending on first click
+            // If header is already sorted descending, then switch to ascending
+            let sortDirection = this.classList.contains('sort-desc') ? 'asc' : 'desc';
             
             // Clear all sort indicators
             headers.forEach(h => {

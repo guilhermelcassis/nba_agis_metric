@@ -345,16 +345,16 @@ td.agis-score {
     padding-bottom: 1rem !important;
 }
 
-/* Value indicators for $/AGIS/G */
+/* Value indicators for $/AGIS/G in table cells */
 td.salary-agis-per-game {
     position: relative;
-    padding-bottom: 1.8rem !important; /* Extra padding for indicators */
+    padding-bottom: 18px !important;
 }
 
 /* Below 100 - Extremely valuable */
 td.salary-agis-per-game[data-value-category="elite"] {
-    color: #00C853 !important; /* Bright green */
-    background-color: rgba(0, 200, 83, 0.05);
+    color: var(--success) !important;
+    background-color: rgba(54, 179, 126, 0.05);
 }
 
 td.salary-agis-per-game[data-value-category="elite"]::after {
@@ -362,17 +362,17 @@ td.salary-agis-per-game[data-value-category="elite"]::after {
     font-size: 8px;
     display: block;
     position: absolute;
-    bottom: 0.4rem;
+    bottom: 2px;
     left: 0;
     right: 0;
     text-align: center;
-    color: #00C853;
+    color: var(--success);
 }
 
 /* 100-200 - Good value */
 td.salary-agis-per-game[data-value-category="good"] {
-    color: #4CAF50 !important; /* Green */
-    background-color: rgba(76, 175, 80, 0.05);
+    color: var(--warning) !important;
+    background-color: rgba(255, 171, 0, 0.05);
 }
 
 td.salary-agis-per-game[data-value-category="good"]::after {
@@ -380,17 +380,17 @@ td.salary-agis-per-game[data-value-category="good"]::after {
     font-size: 8px;
     display: block;
     position: absolute;
-    bottom: 0.4rem;
+    bottom: 2px;
     left: 0;
     right: 0;
     text-align: center;
-    color: #4CAF50;
+    color: var(--warning);
 }
 
 /* Above 200 - Trade candidate */
 td.salary-agis-per-game[data-value-category="trade"] {
-    color: #F44336 !important; /* Red */
-    background-color: rgba(244, 67, 54, 0.05);
+    color: var(--danger) !important;
+    background-color: rgba(255, 86, 48, 0.05);
 }
 
 td.salary-agis-per-game[data-value-category="trade"]::after {
@@ -398,11 +398,11 @@ td.salary-agis-per-game[data-value-category="trade"]::after {
     font-size: 12px;
     display: block;
     position: absolute;
-    bottom: 0.4rem;
+    bottom: 2px;
     left: 0;
     right: 0;
     text-align: center;
-    color: #F44336;
+    color: var(--danger);
 }
 
 /* Efficiency metrics highlighting */
@@ -1811,144 +1811,102 @@ td.salary-agis-per-game[data-value-category="trade"]::after {
     font-size: 0.85rem;
 }
 
-/* Value categories list in explainer */
+/* Value Categories Styling */
 .value-categories-container {
-    margin-top: 1.5rem;
-    background-color: rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
-    padding: 1rem 1.2rem;
-    position: relative; /* Ensure proper stacking context */
-    overflow: hidden;
+    margin-top: 1rem;
 }
 
 .value-categories {
+    list-style: none;
+    padding: 0;
     margin: 0;
-    padding-left: 0;
-    list-style-type: none;
-    position: relative; /* Ensure proper stacking context */
-    z-index: 1; /* Make sure it's above any potential overlap */
 }
 
 .value-categories li {
-    margin-bottom: 0.8rem;
-    font-size: 0.9rem;
     display: flex;
-    align-items: flex-start;
-    line-height: 1.5;
-    position: relative; /* Ensure proper positioning */
+    align-items: center;
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
 }
 
 .value-categories li:last-child {
     margin-bottom: 0;
 }
 
-.value-categories .indicator {
-    display: inline-block;
-    width: 35px;
-    min-width: 35px;
-    margin-right: 10px;
+.value-indicator {
+    flex: 0 0 45px;
     text-align: center;
+    margin-right: 0.5rem;
+}
+
+.value-description {
+    flex: 1;
+}
+
+.elite-value .value-indicator {
+    color: var(--success);
+}
+
+.good-value .value-indicator {
+    color: var(--warning);
+}
+
+.trade-value .value-indicator {
+    color: var(--danger);
+}
+
+/* Metric Items Styling */
+.metric-item {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+.metric-hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.metric-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
     flex-shrink: 0;
 }
 
-/* Star positioning for table cells */
-td.salary-agis-per-game::after {
-    position: absolute;
-    bottom: 4px;
-    left: 0;
-    right: 0;
-    text-align: center;
+.metric-info {
+    flex: 1;
 }
 
-.elite-value {
-    color: #00C853;
+.metric-info h4 {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-.good-value {
-    color: #4CAF50;
+.metric-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
 }
 
-.trade-value {
-    color: #F44336;
+.agis-icon {
+    background-color: rgba(var(--nba-blue-rgb), 0.2);
+    color: var(--nba-blue);
 }
 
-/* Value indicators for $/AGIS/G */
-td.salary-agis-per-game {
-    position: relative;
-}
-
-/* Below 100 - Extremely valuable */
-td.salary-agis-per-game[data-value-category="elite"] {
-    color: #00C853 !important; /* Bright green */
-    background-color: rgba(0, 200, 83, 0.05);
-}
-
-td.salary-agis-per-game[data-value-category="elite"]::after {
-    content: '⭐⭐⭐';
-    font-size: 8px;
-    display: block;
-    position: absolute;
-    bottom: 2px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    color: #00C853;
-}
-
-/* 100-200 - Good value */
-td.salary-agis-per-game[data-value-category="good"] {
-    color: #4CAF50 !important; /* Green */
-    background-color: rgba(76, 175, 80, 0.05);
-}
-
-td.salary-agis-per-game[data-value-category="good"]::after {
-    content: '⭐';
-    font-size: 8px;
-    display: block;
-    position: absolute;
-    bottom: 0.4rem;
-    left: 0;
-    right: 0;
-    text-align: center;
-    color: #4CAF50;
-}
-
-/* Above 200 - Trade candidate */
-td.salary-agis-per-game[data-value-category="trade"] {
-    color: #F44336 !important; /* Red */
-    background-color: rgba(244, 67, 54, 0.05);
-}
-
-td.salary-agis-per-game[data-value-category="trade"]::after {
-    content: '↻';
-    font-size: 12px;
-    display: block;
-    position: absolute;
-    bottom: 0.4rem;
-    left: 0;
-    right: 0;
-    text-align: center;
-    color: #F44336;
-}
-
-/* Fix for header overlapping issue - simplify the approach */
-.data-table thead th.sort-asc::before, 
-.data-table thead th.sort-desc::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: var(--nba-highlight);
-}
-
-/* Ensure header spans are properly positioned */
-.data-table thead th .column-label {
-    position: relative;
-    white-space: nowrap;
-    z-index: 5;
-    display: inline-block;
+.salary-agis-per-game-icon {
+    background-color: rgba(var(--nba-highlight-rgb), 0.2);
+    color: var(--nba-highlight);
 }
 
 /* Table styling specifically for the player stats table */

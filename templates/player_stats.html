@@ -104,9 +104,9 @@
                     <button id="download-csv" class="btn btn-success">
                         Download CSV
                     </button>
-                </div>
-                
-                <div class="table-container">
+    </div>
+    
+    <div class="table-container">
                     <table class="data-table" id="player-stats-table">
                         <thead class="sticky-header">
                             <tr>
@@ -152,35 +152,35 @@
                                 <th class="sortable" data-sort="int" data-column="minutes">
                                     <span class="column-label">MIN</span>
                                 </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for player in players %}
-                            <tr>
-                                <td class="player-name">
-                                    <a href="/player-details/{{ player.player_id }}" class="player-link">
-                                        {{ player.player_name }}
-                                    </a>
-                                </td>
-                                <td>{{ player.team_abbreviation }}</td>
-                                <td>{{ player.position }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td class="player-name">
+                        <a href="/player-details/{{ player.player_id }}" class="player-link">
+                            {{ player.player_name }}
+                        </a>
+                    </td>
+                    <td>{{ player.team_abbreviation }}</td>
+                    <td>{{ player.position }}</td>
                                 <td class="agis-score highlight-cell">{{ "%.1f"|format(player.agis_score) }}</td>
                                 <td class="salary">${{ "{:,}".format(player.salary|int) }}</td>
                                 <td class="salary-agis-per-game highlight-cell">{{ "%.1f"|format(player.salary_agis_per_game) }}</td>
-                                <td>{{ player.points }}</td>
-                                <td>{{ player.rebounds }}</td>
-                                <td>{{ player.assists }}</td>
-                                <td>{{ player.steals }}</td>
-                                <td>{{ player.blocks }}</td>
+                    <td>{{ player.points }}</td>
+                    <td>{{ player.rebounds }}</td>
+                    <td>{{ player.assists }}</td>
+                    <td>{{ player.steals }}</td>
+                    <td>{{ player.blocks }}</td>
                                 <td>{{ "%.1f"|format(player.efficiency) }}</td>
                                 <td>{{ player.games_played }}</td>
                                 <td>{{ player.minutes }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
         </div>
     </div>
     
@@ -192,7 +192,7 @@
                     <h2><i class="fas fa-info-circle"></i> Understanding Metrics</h2>
                 </div>
                 
-                <div class="row">
+        <div class="row">
                     <div class="col-lg-6 mb-3 mb-lg-0">
                         <div class="metric-item">
                             <div class="metric-icon agis-icon">
@@ -217,16 +217,16 @@
                                 <div class="value-categories-container">
                                     <ul class="value-categories">
                                         <li class="elite-value">
-                                            <span class="indicator">⭐⭐⭐</span> 
-                                            <span>Below 100: Extremely valuable players</span>
+                                            <div class="value-indicator">⭐⭐⭐</div> 
+                                            <div class="value-description">Below 100: Extremely valuable players</div>
                                         </li>
                                         <li class="good-value">
-                                            <span class="indicator">⭐</span> 
-                                            <span>100-200: Good value contracts</span>
+                                            <div class="value-indicator">⭐</div> 
+                                            <div class="value-description">100-200: Good value contracts</div>
                                         </li>
                                         <li class="trade-value">
-                                            <span class="indicator">↻</span> 
-                                            <span>Above 200: Potential trade candidates</span>
+                                            <div class="value-indicator">↻</div> 
+                                            <div class="value-description">Above 200: Potential trade candidates</div>
                                         </li>
                                     </ul>
                                 </div>
@@ -234,6 +234,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
             </div>
         </div>
     </div>
@@ -256,13 +258,9 @@
             // Get the AGIS score column header
             const agisHeader = document.querySelector('th[data-column="agis_score"]');
             if (agisHeader) {
-                // Trigger a click to sort by AGIS
+                // Trigger a click to sort by AGIS (now defaults to descending on first click)
                 setTimeout(() => {
                     agisHeader.click();
-                    // If needed, click again to make it descending
-                    if (!agisHeader.classList.contains('sort-desc')) {
-                        agisHeader.click();
-                    }
                     
                     // Force browser to recalculate the sticky position
                     document.querySelector('.table-container').scrollTop = 1;
@@ -271,14 +269,6 @@
                     }, 10);
                 }, 100);
             }
-        } else {
-            // Force browser to recalculate the sticky position
-            setTimeout(() => {
-                document.querySelector('.table-container').scrollTop = 1;
-                setTimeout(() => {
-                    document.querySelector('.table-container').scrollTop = 0;
-                }, 10);
-            }, 100);
         }
         
         // Initialize CSV download
@@ -377,4 +367,4 @@
         }
     }
 </script>
-{% endblock %}
+{% endblock %} 
