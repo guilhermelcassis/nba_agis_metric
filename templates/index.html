@@ -1,21 +1,95 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
-{% block title %}NBA Game Performances | Analytics Hub{% endblock %}
+{% block title %}NBA Dynastat | Playoff Performances{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+<style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    }
+    
+    .loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .loading-spinner {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+    
+    .loading-spinner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        border-top-color: var(--nba-highlight);
+        animation: spin 1s linear infinite;
+    }
+    
+    .loading-spinner::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        border-top-color: var(--nba-blue);
+        animation: spin 0.5s linear infinite reverse;
+    }
+    
+    .loading-text {
+        position: absolute;
+        bottom: -30px;
+        font-size: 1rem;
+        color: var(--nba-highlight);
+        text-align: center;
+        width: 100%;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="loading-text">Loading playoff performances...</div>
+    </div>
+</div>
+
 <!-- Game performances dashboard header with compact design -->
 <div class="stats-dashboard compact-dashboard">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="stats-header">
-                    <h1>Game Performances <span class="season-badge">2024-25</span></h1>
+                    <h1>Playoff Performances <span class="season-badge">2024-25</span></h1>
                 </div>
             </div>
         </div>
@@ -69,7 +143,7 @@
     {% if players %}
         <div class="card-section">
             <div class="table-header">
-                <h2><i class="fas fa-trophy"></i> Top Player Performances</h2>
+                <h2><i class="fas fa-trophy"></i> Dynamite of the Night</h2>
                 <div class="performance-counter">
                     <span class="counter-badge">{{ players|length }}</span> performances found
                 </div>
@@ -141,7 +215,7 @@
                                 {{ "%.2f"|format(player.EFF) }}
                             </td>
                             <td class="agis-score highlight-cell">{{ "%.2f"|format(player.AGIS) }}</td>
-                            <td class="salary">{% if player.SALARY %}${{ "{:,}".format(player.SALARY|int) }}{% else %}N/A{% endif %}</td>
+                            <td class="salary">${{ "{:,}".format(player.SALARY) }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -154,7 +228,7 @@
                 <i class="fas fa-basketball"></i>
             </div>
             <h2>{{ message }}</h2>
-            <p>Try selecting a different date range to view game performances.</p>
+            <p>Try selecting a different date range to view playoff performances.</p>
         </div>
     {% endif %}
 </div>
@@ -165,30 +239,79 @@
 <script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize date picker
+        // Show loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        // Hide loading overlay after content is loaded
+        setTimeout(function() {
+            loadingOverlay.classList.add('hidden');
+        }, 800);
+        
+        // Initialize date pickers
         flatpickr(".datepicker", {
             dateFormat: "Y-m-d",
-            maxDate: "today",
             theme: "dark"
         });
         
-        // Initialize table sorting if table exists
-        if (document.getElementById('performances-table')) {
-            initTableSort('performances-table');
-            
-            // Auto-sort by AGIS score (descending) on page load
-            const agisHeader = document.querySelector('th[data-sort="float"]:nth-of-type(12)');
-            if (agisHeader) {
-                setTimeout(() => {
-                    agisHeader.click();
+        // Initialize sortable tables
+        initTableSort('performances-table');
+        
+        // Quick filters
+        const quickFilters = document.querySelectorAll('.quick-filter-button');
+        const pointsFilter = document.getElementById('points-filter');
+        const positionFilter = document.getElementById('position-filter');
+        const clearFilters = document.getElementById('clear-filters');
+        const tableRows = document.querySelectorAll('#performances-table tbody tr');
+        
+        // Only set up filter functionality if the elements exist
+        if (quickFilters.length && pointsFilter && positionFilter && clearFilters) {
+            quickFilters.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filterType = this.getAttribute('data-filter');
+                    let filterValue = parseInt(this.getAttribute('data-value'));
                     
-                    // Force browser to recalculate the sticky position
-                    document.querySelector('.table-container').scrollTop = 1;
-                    setTimeout(() => {
-                        document.querySelector('.table-container').scrollTop = 0;
-                    }, 10);
-                }, 100);
+                    if (filterType === 'points') {
+                        pointsFilter.value = filterValue;
+                        applyFilters();
+                    }
+                });
+            });
+            
+            function applyFilters() {
+                const minPoints = pointsFilter.value ? parseInt(pointsFilter.value) : 0;
+                const selectedPosition = positionFilter.value;
+                
+                tableRows.forEach(row => {
+                    const points = parseInt(row.querySelector('td:nth-child(6)').textContent);
+                    const position = row.getAttribute('data-position');
+                    
+                    let showRow = true;
+                    
+                    if (minPoints > 0 && points < minPoints) {
+                        showRow = false;
+                    }
+                    
+                    if (selectedPosition && selectedPosition !== 'all' && position !== selectedPosition) {
+                        showRow = false;
+                    }
+                    
+                    row.style.display = showRow ? '' : 'none';
+                });
             }
+            
+            // Filter events
+            pointsFilter.addEventListener('change', applyFilters);
+            positionFilter.addEventListener('change', applyFilters);
+            
+            // Clear filters
+            clearFilters.addEventListener('click', function() {
+                pointsFilter.value = '';
+                positionFilter.value = 'all';
+                
+                tableRows.forEach(row => {
+                    row.style.display = '';
+                });
+            });
         }
     });
 </script>

@@ -14,7 +14,7 @@ def get_player_salary(player_name):
         db_path = os.path.join('nba_data', 'nba_players.db')
         if not os.path.exists(db_path):
             print(f"Database not found at {db_path}")
-            return None
+            return 0
             
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -29,13 +29,13 @@ def get_player_salary(player_name):
         conn.close()
         
         if result and result[0]:
-            # Format as currency without decimal places
-            return f"${int(float(result[0])):,}"
+            # Return as integer, not formatted string
+            return int(float(result[0]))
         else:
-            return "N/A"
+            return 0
     except Exception as e:
         print(f"Error fetching player salary: {str(e)}")
-        return "N/A"
+        return 0
 
 def get_player_details(player_name):
     """Get detailed player information from the SQLite database."""

@@ -1,171 +1,424 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
-{% block title %}{{ player.PLAYER_NAME }} - Game Performance | NBA Analytics Hub{% endblock %}
+{% block title %}{{ player.PLAYER_NAME }} - Playoff Performance | NBA Dynastat{% endblock %}
+
+{% block extra_css %}
+<style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    }
+    
+    .loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .loading-spinner {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+    
+    .loading-spinner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        border-top-color: var(--nba-highlight);
+        animation: spin 1s linear infinite;
+    }
+    
+    .loading-spinner::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        border-top-color: var(--nba-blue);
+        animation: spin 0.5s linear infinite reverse;
+    }
+    
+    .loading-text {
+        position: absolute;
+        bottom: -30px;
+        font-size: 1rem;
+        color: var(--nba-highlight);
+        text-align: center;
+        width: 100%;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .stat-highlight {
+        color: var(--nba-highlight);
+        font-weight: 700;
+    }
+    
+    /* Improved stats grid layout - Dense style */
+    .stats-grid {
+        display: grid;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        background-color: #1a2234;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stats-body {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        width: 100%;
+    }
+    
+    .stats-row {
+        display: contents;
+    }
+    
+    .stats-cell {
+        padding: 0.5rem;
+        text-align: center;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .stats-cell:nth-child(5n) {
+        border-right: none;
+    }
+    
+    .stats-label {
+        color: #8b97b1;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+    
+    .stats-value {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    
+    .stats-value.highlight {
+        color: #f9a826;
+    }
+    
+    .stats-pct {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    .good-pct {
+        color: #4adb73;
+    }
+    
+    .avg-pct {
+        color: #fdcb6e;
+    }
+    
+    .poor-pct {
+        color: #ff7675;
+    }
+    
+    .plus-minus {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    .plus-minus.positive {
+        color: #4adb73;
+    }
+    
+    .plus-minus.negative {
+        color: #ff7675;
+    }
+    
+    /* Progress bar styles */
+    .stats-bar {
+        height: 4px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-top: 0.5rem;
+        overflow: hidden;
+        border-radius: 2px;
+    }
+    
+    .stats-bar-fill {
+        height: 100%;
+    }
+    
+    .stats-bar-fill.efficiency {
+        background-color: #4adb73;
+    }
+    
+    .stats-bar-fill.agis {
+        background-color: #00b4d8;
+    }
+    
+    /* Consistent card styling */
+    .mini-card {
+        background-color: #1a2234;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .mini-card-header {
+        background-color: #111827;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .mini-card-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+    }
+    
+    .mini-card-header h2 i {
+        margin-right: 0.75rem;
+        color: var(--nba-highlight);
+    }
+    
+    .mini-card-header.with-filter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .mini-profile-section {
+        padding: 1.25rem;
+    }
+    
+    /* Fix header alignment */
+    .mini-header {
+        background-color: #17408b;
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .mini-header .container {
+        max-width: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .mini-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #fff;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .mini-subtitle {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+        margin-top: 0.25rem;
+    }
+    
+    .mini-back-link {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        text-decoration: none;
+        margin-top: 0.5rem;
+        display: inline-block;
+        transition: color 0.2s ease;
+    }
+    
+    .mini-back-link:hover {
+        color: #fff;
+    }
+    
+    @media (min-width: 576px) {
+        .mini-header .container {
+            max-width: 540px;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .mini-header .container {
+            max-width: 720px;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .mini-header .container {
+            max-width: 960px;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .mini-header .container {
+            max-width: 1140px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- Player Game Performance Header -->
-<div class="player-header">
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="loading-text">Loading playoff data...</div>
+    </div>
+</div>
+
+<!-- Ultra-compact header -->
+<div class="mini-header">
     <div class="container">
-        <div class="player-banner">
-            <div class="player-info">
-                <h1>{{ player.PLAYER_NAME }}</h1>
-                <div class="game-info">
-                    <span class="game-date">{{ player.GAME_DATE }}</span>
-                    <span class="game-matchup">{{ player.MATCHUP }}</span>
-                </div>
-                <div class="game-result">
-                    <span class="opp-record">{{ player.OPP_RECORD }}</span>
-                </div>
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="mini-title">
+                    {{ player.PLAYER_NAME }}
+                    <span class="mini-subtitle">{{ player.GAME_DATE }} | {{ player.MATCHUP }}</span>
+                </h1>
+                <a href="/" class="mini-back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Playoffs
+                </a>
             </div>
-            <div class="player-metrics">
-                <div class="metric-badge">
-                    <div class="badge-value">{{ player.PTS }}</div>
-                    <div class="badge-label">PTS</div>
-                </div>
-                <div class="metric-badge">
-                    <div class="badge-value">{{ "%.2f"|format(player.EFF) }}</div>
-                    <div class="badge-label">EFF</div>
-                </div>
-                <div class="metric-badge highlight">
-                    <div class="badge-value">{{ "%.2f"|format(player.AGIS) }}</div>
-                    <div class="badge-label">AGIS</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="breadcrumb-nav">
-            <a href="/" class="breadcrumb-link">
-                <i class="fas fa-home"></i> Home
-            </a>
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">Player Game Details</span>
         </div>
     </div>
 </div>
 
 <div class="container">
+    <!-- Game Performance - Dense Style -->
     <div class="row">
-        <!-- Player Information Column -->
-        <div class="col-lg-4">
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-user"></i> Player Profile</h2>
+        <div class="col-12">
+            <div class="mini-card">
+                <div class="mini-card-header">
+                    <h2><i class="fas fa-chart-line"></i> Playoff Performance</h2>
                 </div>
-                
-                <div class="player-card">
-                    {% if player_db %}
-                        <div class="profile-section">
-                            <h3 class="profile-heading">Personal</h3>
-                            <div class="profile-grid">
-                                {{ macros.context_item("Position", player_db.position) }}
-                                {{ macros.context_item("Age", player_db.age) }}
-                                {{ macros.context_item("Height", player_db.height) }}
-                                {{ macros.context_item("Weight", player_db.weight ~ " lbs") if player_db.weight else macros.context_item("Weight", "N/A") }}
-                                {{ macros.context_item("Country", player_db.country) }}
+                <div class="stats-grid">                
+                    <div class="stats-body">
+                        <!-- Row 1 -->
+                        <div class="stats-cell">
+                            <span class="stats-label">POINTS</span>
+                            <div class="stats-value highlight">{{ player.PTS }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">REBOUNDS</span>
+                            <div class="stats-value">{{ player.REB }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">ASSISTS</span>
+                            <div class="stats-value">{{ player.AST }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">FG</span>
+                            <div class="stats-value">{{ player.FGM }}/{{ player.FGA }}</div>
+                            <div class="stats-pct {% if player.FG_PCT >= 0.5 %}good-pct{% elif player.FG_PCT >= 0.4 %}avg-pct{% else %}poor-pct{% endif %}">
+                                {{ "%.1f"|format(player.FG_PCT * 100) }}%
+                            </div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">3PT</span>
+                            <div class="stats-value">{{ player.FG3M }}/{{ player.FG3A }}</div>
+                            <div class="stats-pct {% if player.FG3_PCT >= 0.4 %}good-pct{% elif player.FG3_PCT >= 0.33 %}avg-pct{% else %}poor-pct{% endif %}">
+                                {{ "%.1f"|format(player.FG3_PCT * 100) }}%
                             </div>
                         </div>
                         
-                        <div class="profile-section">
-                            <h3 class="profile-heading">Team Info</h3>
-                            <div class="profile-grid">
-                                {{ macros.context_item("Team", player_db.team_name) }}
-                                {{ macros.context_item("Jersey #", player_db.jersey) }}
-                                {{ macros.context_item_salary("2024-25 Salary", player_db.salary) }}
+                        <!-- Row 2 -->
+                        <div class="stats-cell">
+                            <span class="stats-label">STEALS</span>
+                            <div class="stats-value">{{ player.STL }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">BLOCKS</span>
+                            <div class="stats-value">{{ player.BLK }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">TURNOVERS</span>
+                            <div class="stats-value">{{ player.TOV }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">FT</span>
+                            <div class="stats-value">{{ player.FTM }}/{{ player.FTA }}</div>
+                            <div class="stats-pct {% if player.FT_PCT >= 0.8 %}good-pct{% elif player.FT_PCT >= 0.7 %}avg-pct{% else %}poor-pct{% endif %}">
+                                {{ "%.1f"|format(player.FT_PCT * 100) }}%
+                            </div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">+/-</span>
+                            <div class="stats-value">{{ player.PLUS_MINUS }}</div>
+                            <div class="plus-minus {% if player.PLUS_MINUS > 0 %}positive{% else %}negative{% endif %}">
+                                {% if player.PLUS_MINUS > 0 %}+{{ player.PLUS_MINUS }}{% else %}{{ player.PLUS_MINUS }}{% endif %}
                             </div>
                         </div>
                         
-                        <div class="profile-section">
-                            <h3 class="profile-heading">Career</h3>
-                            <div class="profile-grid">
-                                {{ macros.context_item("Experience", player_db.seasons_exp ~ " years") if player_db.seasons_exp else macros.context_item("Experience", "N/A") }}
-                                {{ macros.context_item("College", player_db.college) if player_db.college else macros.context_item("College", "N/A") }}
-                                {% if player_db.draft_year and player_db.draft_year != '' %}
-                                    {% set draft_info = "Round " ~ player_db.draft_round ~ ", Pick " ~ player_db.draft_number ~ " (" ~ player_db.draft_year ~ ")" %}
-                                    {{ macros.context_item("Draft", draft_info) }}
-                                {% else %}
-                                    {{ macros.context_item("Draft", "Undrafted") }}
-                                {% endif %}
+                        <!-- Row 3 -->
+                        <div class="stats-cell">
+                            <span class="stats-label">OFF. REBOUNDS</span>
+                            <div class="stats-value">{{ player.OREB }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">DEF. REBOUNDS</span>
+                            <div class="stats-value">{{ player.DREB }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">PERSONAL FOULS</span>
+                            <div class="stats-value">{{ player.PF }}</div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">EFF</span>
+                            <div class="stats-value">{{ "%.1f"|format(player.EFF) }}</div>
+                            <div class="stats-bar">
+                                <div class="stats-bar-fill efficiency" style="width: {{ (player.EFF / 50) * 100 }}%"></div>
                             </div>
                         </div>
-                    {% else %}
-                        <div class="profile-section">
-                            <div class="profile-grid">
-                                {{ macros.context_item("Name", player.PLAYER_NAME) }}
-                                {{ macros.context_item_salary("2024-25 Salary", player.SALARY) }}
+                        <div class="stats-cell">
+                            <span class="stats-label">AGIS</span>
+                            <div class="stats-value highlight">{{ "%.1f"|format(player.AGIS) }}</div>
+                            <div class="stats-bar">
+                                <div class="stats-bar-fill agis" style="width: {{ (player.AGIS / 150) * 100 }}%"></div>
                             </div>
                         </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Game Context Section -->
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-basketball"></i> Game Context</h2>
-                </div>
-                
-                <div class="context-grid">
-                    {{ macros.context_item("Matchup", player.MATCHUP) }}
-                    {{ macros.context_item("Opponent Record", player.OPP_RECORD) }}
-                    {{ macros.context_item("Minutes Played", player.MIN_SEC) }}
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Game Performance Details Column -->
-        <div class="col-lg-8">
-            <!-- Game Performance Breakdown -->
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-chart-bar"></i> Performance Breakdown</h2>
-                </div>
-                
-                <div class="performance-breakdown">
-                    <!-- Scoring & Shooting -->
-                    <div class="breakdown-section">
-                        <h3 class="breakdown-heading">Scoring</h3>
-                        <div class="stat-row">
-                            {{ macros.shooting_stat(player.FGM, player.FGA, player.FG_PCT, "Field Goals", [0.4, 0.5]) }}
-                            {{ macros.shooting_stat(player.FG3M, player.FG3A, player.FG3_PCT, "3-Pointers", [0.33, 0.4]) }}
-                            {{ macros.shooting_stat(player.FTM, player.FTA, player.FT_PCT, "Free Throws", [0.7, 0.8]) }}
-                        </div>
-                    </div>
-                    
-                    <!-- Box Score Stats -->
-                    <div class="breakdown-section">
-                        <h3 class="breakdown-heading">Box Score</h3>
-                        <div class="stat-row">
-                            {{ macros.stat_item(player.REB, "Rebounds") }}
-                            {{ macros.stat_item(player.AST, "Assists") }}
-                            {{ macros.stat_item(player.STL, "Steals") }}
-                            {{ macros.stat_item(player.BLK, "Blocks") }}
-                            {{ macros.stat_item(player.TOV, "Turnovers") }}
-                        </div>
-                    </div>
-                    
-                    <!-- Advanced Stats -->
-                    <div class="breakdown-section">
-                        <h3 class="breakdown-heading">Advanced</h3>
-                        <div class="stat-row">
-                            {{ macros.stat_item(player.OREB, "Off. Rebounds") }}
-                            {{ macros.stat_item(player.DREB, "Def. Rebounds") }}
-                            {{ macros.stat_item(player.PLUS_MINUS, "Plus/Minus") }}
-                            {{ macros.stat_item(player.PF, "Personal Fouls") }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Game History Section -->
-            <div class="card-section">
-                <div class="table-header">
-                    <h2><i class="fas fa-history"></i> Game History</h2>
+    </div>
+
+    <!-- Game History Section -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="mini-card">
+                <div class="mini-card-header with-filter">
+                    <h2><i class="fas fa-history"></i> Playoff History</h2>
                     <div class="history-filter">
                         <select class="form-control form-control-sm" id="game-filter">
                             <option value="all">All Games</option>
-                            <option value="home">Home Games</option>
-                            <option value="away">Away Games</option>
+                            <option value="home">Home</option>
+                            <option value="away">Away</option>
                         </select>
                     </div>
                 </div>
@@ -174,13 +427,68 @@
             </div>
         </div>
     </div>
+    
+    <!-- Additional Player Details (if available) - Compact Version -->
+    {% if player_db %}
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="mini-card">
+                <div class="mini-card-header">
+                    <h2><i class="fas fa-id-card"></i> Player Details</h2>
+                </div>
+                
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="mini-profile-section">
+                            <div class="mini-profile-grid">
+                                <!-- Primary information - first column -->
+                                {{ macros.mini_context_item("Position", player_db.position) }}
+                                {{ macros.mini_context_item("Team", player_db.team_name) }}
+                                {{ macros.mini_context_item("Salary", player_db.salary) }}
+                                {{ macros.mini_context_item("Jersey", "#" ~ player_db.jersey) if player_db.jersey else "" }}
+                                {{ macros.mini_context_item("Experience", player_db.seasons_exp ~ " years") if player_db.seasons_exp else "" }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mini-profile-section">
+                            <div class="mini-profile-grid">
+                                <!-- Secondary information - second column -->
+                                {{ macros.mini_context_item("Age", player_db.age) }}
+                                {{ macros.mini_context_item("Height", player_db.height) }}
+                                {{ macros.mini_context_item("Weight", player_db.weight ~ " lbs") if player_db.weight else macros.mini_context_item("Weight", "N/A") }}
+                                {{ macros.mini_context_item("Country", player_db.country) }}
+                                {{ macros.mini_context_item("College", player_db.college) if player_db.college else "" }}
+                                {% if player_db.draft_year and player_db.draft_year != '' %}
+                                    {% set draft_info = "Rd " ~ player_db.draft_round ~ ", Pick " ~ player_db.draft_number ~ " (" ~ player_db.draft_year ~ ")" %}
+                                    {{ macros.mini_context_item("Draft", draft_info) }}
+                                {% else %}
+                                    {{ macros.mini_context_item("Draft", "Undrafted") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_js %}
 <script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Show loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        // Hide loading overlay after content is loaded
+        setTimeout(function() {
+            loadingOverlay.classList.add('hidden');
+        }, 800);
+        
         // Initialize table sorting
         initTableSort('gameHistoryTable');
         

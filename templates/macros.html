@@ -37,6 +37,20 @@
 </div>
 {% endmacro %}
 
+{% macro mini_context_item(title, value) %}
+<div class="mini-context-row">
+    <div class="mini-context-label">{{ title }}</div>
+    <div class="mini-context-value">{{ value|safe }}</div>
+</div>
+{% endmacro %}
+
+{% macro mini_context_item_salary(title, value) %}
+<div class="mini-context-row">
+    <div class="mini-context-label">{{ title }}</div>
+    <div class="mini-context-value salary">{{ value|safe }}</div>
+</div>
+{% endmacro %}
+
 {% macro player_table(players) %}
 <div class="table-container">
     <table class="data-table">

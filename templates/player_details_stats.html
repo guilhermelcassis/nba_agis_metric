@@ -1,211 +1,580 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros %}
 
-{% block title %}{{ player.player_name }} - Season Stats | NBA Analytics Hub{% endblock %}
+{% block title %}{{ player.player_name }} - Season Stats | NBA Dynastat{% endblock %}
+
+{% block extra_css %}
+<style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    }
+    
+    .loading-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .loading-spinner {
+        position: relative;
+        width: 100px;
+        height: 100px;
+    }
+    
+    .loading-spinner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        border-top-color: var(--nba-highlight);
+        animation: spin 1s linear infinite;
+    }
+    
+    .loading-spinner::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        border-top-color: var(--nba-blue);
+        animation: spin 0.5s linear infinite reverse;
+    }
+    
+    .loading-text {
+        position: absolute;
+        bottom: -30px;
+        font-size: 1rem;
+        color: var(--nba-highlight);
+        text-align: center;
+        width: 100%;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .rank-badge {
+        display: inline-block;
+        font-size: 0.65rem;
+        padding: 0.1rem 0.3rem;
+        border-radius: 3px;
+        margin-left: 0.2rem;
+        background-color: rgba(0, 0, 0, 0.2);
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+    
+    .rank-elite {
+        background-color: rgba(54, 179, 126, 0.2);
+        color: #4adb73;
+    }
+    
+    .rank-good {
+        background-color: rgba(255, 171, 0, 0.2);
+        color: #fdcb6e;
+    }
+    
+    .rank-average {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #8b97b1;
+    }
+    
+    /* Improved stats grid layout - Dense style */
+    .stats-grid {
+        display: grid;
+        border-radius: 0.25rem;
+        overflow: hidden;
+        background-color: #1a2234;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stats-body {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        width: 100%;
+    }
+    
+    .stats-row {
+        display: contents;
+    }
+    
+    .stats-cell {
+        padding: 0.5rem;
+        text-align: center;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .stats-cell:nth-child(5n) {
+        border-right: none;
+    }
+    
+    .stats-label {
+        color: #8b97b1;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+    
+    .stats-value {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    
+    .stats-value.highlight {
+        color: #f9a826;
+    }
+    
+    .stats-rank {
+        font-size: 0.65rem;
+        margin-top: 0.25rem;
+        color: #8b97b1;
+    }
+    
+    .stats-pct {
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    .good-pct {
+        color: #4adb73;
+    }
+    
+    .avg-pct {
+        color: #fdcb6e;
+    }
+    
+    .poor-pct {
+        color: #ff7675;
+    }
+    
+    /* Progress bar styles */
+    .stats-bar {
+        height: 4px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-top: 0.5rem;
+        overflow: hidden;
+        border-radius: 2px;
+    }
+    
+    .stats-bar-fill {
+        height: 100%;
+    }
+    
+    .stats-bar-fill.efficiency {
+        background-color: #4adb73;
+    }
+    
+    .stats-bar-fill.agis {
+        background-color: #00b4d8;
+    }
+    
+    /* Value stars */
+    .value-stars {
+        color: gold;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* Consistent card styling */
+    .mini-card {
+        background-color: #1a2234;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .mini-card-header {
+        background-color: #111827;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .mini-card-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+    }
+    
+    .mini-card-header h2 i {
+        margin-right: 0.75rem;
+        color: var(--nba-highlight);
+    }
+    
+    .mini-card-header.with-filter {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .mini-profile-section {
+        padding: 1.25rem;
+    }
+    
+    /* Fix header alignment */
+    .mini-header {
+        background-color: #17408b;
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .mini-header .container {
+        max-width: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .mini-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #fff;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .mini-subtitle {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+        margin-top: 0.25rem;
+    }
+    
+    .mini-back-link {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        text-decoration: none;
+        margin-top: 0.5rem;
+        display: inline-block;
+        transition: color 0.2s ease;
+    }
+    
+    .mini-back-link:hover {
+        color: #fff;
+    }
+    
+    @media (min-width: 576px) {
+        .mini-header .container {
+            max-width: 540px;
+        }
+    }
+    
+    @media (min-width: 768px) {
+        .mini-header .container {
+            max-width: 720px;
+        }
+    }
+    
+    @media (min-width: 992px) {
+        .mini-header .container {
+            max-width: 960px;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .mini-header .container {
+            max-width: 1140px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- Player Profile Header -->
-<div class="player-header">
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="loading-text">Loading player data...</div>
+    </div>
+</div>
+
+<!-- Ultra-compact header -->
+<div class="mini-header">
     <div class="container">
-        <div class="player-banner">
-            <div class="player-info">
-                <h1>{{ player.player_name }}</h1>
-                <div class="game-info">
-                    <span class="player-team">{{ player.team_name }}</span>
-                    <span class="player-position">{{ player.position }}</span>
-                </div>
-                <div class="player-season">
-                    <span class="season-label">2024-25 Season</span>
-                </div>
+        <div class="row align-items-center">
+            <div class="col">
+                <h1 class="mini-title">
+                    {{ player.player_name }}
+                    <span class="mini-subtitle">{{ player.team_name }} | {{ player.position }}</span>
+                </h1>
+                <a href="/player-stats" class="mini-back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Stats
+                </a>
             </div>
-            <div class="player-metrics">
-                <div class="metric-badge">
-                    <div class="badge-value">{{ player.games_played }}</div>
-                    <div class="badge-label">Games</div>
-                </div>
-                <div class="metric-badge">
-                    <div class="badge-value">{{ "%.1f"|format(player.agis_per_game) }}</div>
-                    <div class="badge-label">AGIS/G</div>
-                </div>
-                <div class="metric-badge highlight">
-                    <div class="badge-value">{{ "%.1f"|format(player.agis_score) }}</div>
-                    <div class="badge-label">AGIS</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="breadcrumb-nav">
-            <a href="/player-stats" class="breadcrumb-link">
-                <i class="fas fa-chart-line"></i> Season Stats
-            </a>
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">{{ player.player_name }}</span>
         </div>
     </div>
 </div>
 
-<div class="container">
+<div class="container">   
+    <!-- Performance Metrics - Dense Style -->
     <div class="row">
-        <!-- Player Information Column -->
-        <div class="col-lg-4">
-            <!-- Player Details Card -->
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-user"></i> Player Profile</h2>
+        <div class="col-12">
+            <div class="mini-card">
+                <div class="mini-card-header">
+                    <h2><i class="fas fa-chart-line"></i> Season Performance</h2>
                 </div>
-                
-                <div class="player-card">
-                    <div class="profile-section">
-                        <h3 class="profile-heading">Personal Info</h3>
-                        <div class="profile-grid">
-                            {{ macros.context_item("Age", player.age) }}
-                            {{ macros.context_item("Height", player.height) }}
-                            {{ macros.context_item("Weight", player.weight) }}
-                            {{ macros.context_item("Country", player.country) }}
+                <div class="stats-grid">
+                    <div class="stats-body">
+                        <!-- Row 1 -->
+                        <div class="stats-cell">
+                            <span class="stats-label">POINTS</span>
+                            <div class="stats-value highlight">{{ player.points }}</div>
+                            {% if player.points_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.points_rank <= 10 else 'rank-good' if player.points_rank <= 30 else 'rank-average' }}">
+                                {% if player.points_rank == 1 %}1st
+                                {% elif player.points_rank == 2 %}2nd
+                                {% elif player.points_rank == 3 %}3rd
+                                {% else %}{{ player.points_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
                         </div>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3 class="profile-heading">Career Info</h3>
-                        <div class="profile-grid">
-                            {{ macros.context_item("Experience", player.seasons_exp ~ " years") }}
-                            {{ macros.context_item("College", player.college) }}
-                            {{ macros.context_item("Draft", player.draft_year ~ " (Rd " ~ player.draft_round ~ ", Pick " ~ player.draft_number ~ ")") }}
-                            {{ macros.context_item("Jersey", "#" ~ player.jersey) }}
+                        <div class="stats-cell">
+                            <span class="stats-label">REBOUNDS</span>
+                            <div class="stats-value">{{ player.rebounds }}</div>
+                            {% if player.rebounds_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.rebounds_rank <= 10 else 'rank-good' if player.rebounds_rank <= 30 else 'rank-average' }}">
+                                {% if player.rebounds_rank == 1 %}1st
+                                {% elif player.rebounds_rank == 2 %}2nd
+                                {% elif player.rebounds_rank == 3 %}3rd
+                                {% else %}{{ player.rebounds_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
                         </div>
-                    </div>
-                    
-                    <div class="profile-section">
-                        <h3 class="profile-heading">Financial</h3>
-                        <div class="profile-grid">
-                            {{ macros.context_item_salary("Salary (24-25)", "$" ~ "{:,}".format(player.salary|int)) }}
-                            {{ macros.context_item("$/AGIS", "<span class='salary-per-agis'>" ~ ("%.1f"|format(player.salary_per_agis)) ~ "</span>") }}
-                            {{ macros.context_item("$/AGIS/Game", "<span class='salary-agis-per-game'>" ~ ("%.1f"|format(player.salary_agis_per_game)) ~ "</span>") }}
+                        <div class="stats-cell">
+                            <span class="stats-label">ASSISTS</span>
+                            <div class="stats-value">{{ player.assists }}</div>
+                            {% if player.assists_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.assists_rank <= 10 else 'rank-good' if player.assists_rank <= 30 else 'rank-average' }}">
+                                {% if player.assists_rank == 1 %}1st
+                                {% elif player.assists_rank == 2 %}2nd
+                                {% elif player.assists_rank == 3 %}3rd
+                                {% else %}{{ player.assists_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Value Metrics Explainer -->
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-question-circle"></i> Value Metrics</h2>
-                </div>
-                
-                <div class="explainer-box">
-                    <div class="explainer-item">
-                        <div class="explainer-icon salary-per-agis-icon">
-                            <i class="fas fa-dollar-sign"></i>
+                        <div class="stats-cell">
+                            <span class="stats-label">FG %</span>
+                            <div class="stats-value">{{ "%.1f"|format(player.fg_pct * 100) }}%</div>
+                            <div class="stats-pct {% if player.fg_pct >= 0.5 %}good-pct{% elif player.fg_pct >= 0.43 %}avg-pct{% else %}poor-pct{% endif %}">
+                                {% if player.fg_pct_rank is defined %}
+                                {% if player.fg_pct_rank == 1 %}1st
+                                {% elif player.fg_pct_rank == 2 %}2nd
+                                {% elif player.fg_pct_rank == 3 %}3rd
+                                {% else %}{{ player.fg_pct_rank }}th{% endif %} in league
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="explainer-content">
-                            <h4>$/AGIS</h4>
-                            <p>Shows how much a team is paying per unit of player impact (Salary ÷ AGIS)</p>
+                        <div class="stats-cell">
+                            <span class="stats-label">3PT %</span>
+                            <div class="stats-value">{{ "%.1f"|format(player.fg3_pct * 100) }}%</div>
+                            <div class="stats-pct {% if player.fg3_pct >= 0.4 %}good-pct{% elif player.fg3_pct >= 0.33 %}avg-pct{% else %}poor-pct{% endif %}">
+                                {% if player.fg3_pct_rank is defined %}
+                                {% if player.fg3_pct_rank == 1 %}1st
+                                {% elif player.fg3_pct_rank == 2 %}2nd
+                                {% elif player.fg3_pct_rank == 3 %}3rd
+                                {% else %}{{ player.fg3_pct_rank }}th{% endif %} in league
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="explainer-item">
-                        <div class="explainer-icon salary-agis-per-game-icon">
-                            <i class="fas fa-balance-scale"></i>
+                        
+                        <!-- Row 2 -->
+                        <div class="stats-cell">
+                            <span class="stats-label">STEALS</span>
+                            <div class="stats-value">{{ player.steals }}</div>
+                            {% if player.steals_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.steals_rank <= 10 else 'rank-good' if player.steals_rank <= 30 else 'rank-average' }}">
+                                {% if player.steals_rank == 1 %}1st
+                                {% elif player.steals_rank == 2 %}2nd
+                                {% elif player.steals_rank == 3 %}3rd
+                                {% else %}{{ player.steals_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
                         </div>
-                        <div class="explainer-content">
-                            <h4>$/AGIS/G</h4>
-                            <p>Calculated as (Salary × Games) ÷ AGIS². This value metric rewards consistent high performance across more games. Lower values indicate better contract efficiency relative to sustained impact.</p>
+                        <div class="stats-cell">
+                            <span class="stats-label">BLOCKS</span>
+                            <div class="stats-value">{{ player.blocks }}</div>
+                            {% if player.blocks_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.blocks_rank <= 10 else 'rank-good' if player.blocks_rank <= 30 else 'rank-average' }}">
+                                {% if player.blocks_rank == 1 %}1st
+                                {% elif player.blocks_rank == 2 %}2nd
+                                {% elif player.blocks_rank == 3 %}3rd
+                                {% else %}{{ player.blocks_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">MINUTES</span>
+                            <div class="stats-value">{{ player.minutes }}</div>
+                            {% if player.minutes_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.minutes_rank <= 10 else 'rank-good' if player.minutes_rank <= 30 else 'rank-average' }}">
+                                {% if player.minutes_rank == 1 %}1st
+                                {% elif player.minutes_rank == 2 %}2nd
+                                {% elif player.minutes_rank == 3 %}3rd
+                                {% else %}{{ player.minutes_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">FT %</span>
+                            <div class="stats-value">{{ "%.1f"|format(player.ft_pct * 100) }}%</div>
+                            <div class="stats-pct {% if player.ft_pct >= 0.85 %}good-pct{% elif player.ft_pct >= 0.75 %}avg-pct{% else %}poor-pct{% endif %}">
+                                {% if player.ft_pct_rank is defined %}
+                                {% if player.ft_pct_rank == 1 %}1st
+                                {% elif player.ft_pct_rank == 2 %}2nd
+                                {% elif player.ft_pct_rank == 3 %}3rd
+                                {% else %}{{ player.ft_pct_rank }}th{% endif %} in league
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">GAMES</span>
+                            <div class="stats-value">{{ player.games_played }}</div>
+                        </div>
+                        
+                        <!-- Row 3 -->
+                        <div class="stats-cell">
+                            <span class="stats-label">EFFICIENCY</span>
+                            <div class="stats-value">{{ player.efficiency }}</div>
+                            <div class="stats-bar">
+                                <div class="stats-bar-fill efficiency" style="width: {{ (player.efficiency / 5000) * 100 }}%"></div>
+                            </div>
+                            {% if player.efficiency_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.efficiency_rank <= 10 else 'rank-good' if player.efficiency_rank <= 30 else 'rank-average' }}">
+                                {% if player.efficiency_rank == 1 %}1st
+                                {% elif player.efficiency_rank == 2 %}2nd
+                                {% elif player.efficiency_rank == 3 %}3rd
+                                {% else %}{{ player.efficiency_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">AGIS SCORE</span>
+                            <div class="stats-value highlight">{{ "%.1f"|format(player.agis_score) }}</div>
+                            <div class="stats-bar">
+                                <div class="stats-bar-fill agis" style="width: {{ (player.agis_score / 10000) * 100 }}%"></div>
+                            </div>
+                            {% if player.agis_score_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.agis_score_rank <= 10 else 'rank-good' if player.agis_score_rank <= 30 else 'rank-average' }}">
+                                {% if player.agis_score_rank == 1 %}1st
+                                {% elif player.agis_score_rank == 2 %}2nd
+                                {% elif player.agis_score_rank == 3 %}3rd
+                                {% else %}{{ player.agis_score_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">AGIS/G</span>
+                            <div class="stats-value">{{ "%.1f"|format(player.agis_per_game) }}</div>
+                            {% if player.agis_per_game_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.agis_per_game_rank <= 10 else 'rank-good' if player.agis_per_game_rank <= 30 else 'rank-average' }}">
+                                {% if player.agis_per_game_rank == 1 %}1st
+                                {% elif player.agis_per_game_rank == 2 %}2nd
+                                {% elif player.agis_per_game_rank == 3 %}3rd
+                                {% else %}{{ player.agis_per_game_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">$/AGIS/G</span>
+                            <div class="stats-value">{{ "%.1f"|format(player.salary_agis_per_game) }}</div>
+                            <div class="value-stars">
+                                {% if player.salary_agis_per_game < 100 %}⭐⭐⭐
+                                {% elif player.salary_agis_per_game <= 200 %}⭐
+                                {% else %}↻{% endif %}
+                            </div>
+                            {% if player.salary_agis_per_game_rank is defined %}
+                            <div class="stats-rank {{ 'rank-elite' if player.salary_agis_per_game_rank <= 10 else 'rank-good' if player.salary_agis_per_game_rank <= 30 else 'rank-average' }}">
+                                {% if player.salary_agis_per_game_rank == 1 %}1st
+                                {% elif player.salary_agis_per_game_rank == 2 %}2nd
+                                {% elif player.salary_agis_per_game_rank == 3 %}3rd
+                                {% else %}{{ player.salary_agis_per_game_rank }}th{% endif %} in league
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="stats-cell">
+                            <span class="stats-label">GAMES STARTED</span>
+                            <div class="stats-value">{{ player.games_started }}</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Performance Stats Column -->
-        <div class="col-lg-8">
-            <!-- Season Statistics Overview -->
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-chart-bar"></i> Season Overview</h2>
+    </div>
+            
+    <!-- Additional player details -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="mini-card">
+                <div class="mini-card-header">
+                    <h2><i class="fas fa-id-card"></i> Player Details</h2>
                 </div>
                 
-                <div class="summary-row">
-                    {{ macros.summary_box(player.points, "Points") }}
-                    {{ macros.summary_box(player.rebounds, "Rebounds") }}
-                    {{ macros.summary_box(player.assists, "Assists") }}
-                    {{ macros.summary_box(player.steals, "Steals") }}
-                    {{ macros.summary_box(player.blocks, "Blocks") }}
-                </div>
-                
-                <div class="stats-detail">
-                    <div class="stats-grid">
-                        <div class="stats-item">
-                            <div class="stats-label">Games Played</div>
-                            <div class="stats-value">{{ player.games_played }}</div>
-                        </div>
-                        <div class="stats-item">
-                            <div class="stats-label">Games Started</div>
-                            <div class="stats-value">{{ player.games_started }}</div>
-                        </div>
-                        <div class="stats-item">
-                            <div class="stats-label">Minutes</div>
-                            <div class="stats-value">{{ player.minutes }}</div>
-                        </div>
-                        <div class="stats-item">
-                            <div class="stats-label">Efficiency</div>
-                            <div class="stats-value efficiency-{{ 'high' if player.efficiency > 2500 else 'medium' if player.efficiency > 1500 else 'low' }}">
-                                {{ player.efficiency }}
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="mini-profile-section">
+                            <div class="mini-profile-grid">
+                                <!-- Primary information - first column -->
+                                {{ macros.mini_context_item("Position", player.position) }}
+                                {{ macros.mini_context_item("Team", player.team_name) }}
+                                {{ macros.mini_context_item("Jersey", "#" ~ player.jersey) }}
+                                {{ macros.mini_context_item("Age", player.age) }}
+                                {{ macros.mini_context_item("Experience", player.seasons_exp ~ " years") }}
+                                {{ macros.mini_context_item("Salary", "$" ~ "{:,}".format(player.salary|int)) }}
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Shooting Percentages -->
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-bullseye"></i> Shooting</h2>
-                </div>
-                
-                <div class="stat-row">
-                    {{ macros.shooting_stat(0, 0, player.fg_pct, "Field Goal %", [0.43, 0.5]) }}
-                    {{ macros.shooting_stat(0, 0, player.fg3_pct, "3-Point %", [0.33, 0.4]) }}
-                    {{ macros.shooting_stat(0, 0, player.ft_pct, "Free Throw %", [0.75, 0.85]) }}
-                </div>
-            </div>
-            
-            <!-- Performance Metrics -->
-            <div class="card-section">
-                <div class="section-title">
-                    <h2><i class="fas fa-tachometer-alt"></i> Performance Metrics</h2>
-                </div>
-                
-                <div class="metric-cards">
-                    <div class="metric-card">
-                        <div class="metric-card-header efficiency-{{ 'high' if player.efficiency > 2500 else 'medium' if player.efficiency > 1500 else 'low' }}">
-                            <i class="fas fa-chart-line"></i> Efficiency
-                        </div>
-                        <div class="metric-card-value">{{ player.efficiency }}</div>
-                        <div class="metric-card-desc">Overall statistical performance</div>
-                    </div>
                     
-                    <div class="metric-card">
-                        <div class="metric-card-header agis-score-header">
-                            <i class="fas fa-star"></i> AGIS Score
+                    <div class="col-md-6">
+                        <div class="mini-profile-section">
+                            <div class="mini-profile-grid">
+                                <!-- Secondary information - second column -->
+                                {{ macros.mini_context_item("Height", player.height) }}
+                                {{ macros.mini_context_item("Weight", player.weight) }}
+                                {{ macros.mini_context_item("Country", player.country) }}
+                                {{ macros.mini_context_item("College", player.college) }}
+                                {% set draft_info = "Rd " ~ player.draft_round ~ ", Pick " ~ player.draft_number ~ " (" ~ player.draft_year ~ ")" %}
+                                {{ macros.mini_context_item("Draft", draft_info) }}
+                                <div class="mini-context-row">
+                                    <div class="mini-context-label">Contract Efficiency</div>
+                                    <div class="mini-context-value">
+                                        <span class="salary-agis-per-game-value">{{ "%.1f"|format(player.salary_agis_per_game) }}</span>
+                                        <span class="mini-efficiency-category 
+                                            {% if player.salary_agis_per_game < 100 %}elite-value
+                                            {% elif player.salary_agis_per_game <= 200 %}good-value
+                                            {% else %}trade-value{% endif %}">
+                                            ({% if player.salary_agis_per_game < 100 %}Elite
+                                            {% elif player.salary_agis_per_game <= 200 %}Good
+                                            {% else %}Poor{% endif %})
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="metric-card-value agis-score">{{ "%.1f"|format(player.agis_score) }}</div>
-                        <div class="metric-card-desc">Advanced Game Impact Score (total)</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-card-header agis-per-game-header">
-                            <i class="fas fa-bolt"></i> AGIS Per Game
-                        </div>
-                        <div class="metric-card-value agis-per-game">{{ "%.1f"|format(player.agis_per_game) }}</div>
-                        <div class="metric-card-desc">Average impact per game</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-card-header salary-agis-per-game-header">
-                            <i class="fas fa-balance-scale"></i> $/AGIS/Game
-                        </div>
-                        <div class="metric-card-value salary-agis-per-game">{{ "%.1f"|format(player.salary_agis_per_game) }}</div>
-                        <div class="metric-card-desc">Value metric (lower is better)</div>
                     </div>
                 </div>
             </div>
@@ -214,10 +583,18 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_js %}
 <script src="{{ url_for('static', filename='js/table-sort.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Show loading overlay
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        // Hide loading overlay after content is loaded
+        setTimeout(function() {
+            loadingOverlay.classList.add('hidden');
+        }, 800);
+        
         // Initialize any sortable tables if present
         const tables = document.querySelectorAll('.data-table');
         tables.forEach(table => {
