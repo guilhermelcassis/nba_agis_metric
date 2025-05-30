@@ -1,4 +1,4 @@
-app = "nba-stats"
+app = "nba-stats-metrics"
 primary_region = "ewr" # Change this to your preferred region
 kill_signal = "SIGINT"
 kill_timeout = 5
