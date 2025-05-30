@@ -99,75 +99,61 @@
     <!-- Filter section in horizontal layout above the table -->
     <div class="row mb-3">
         <div class="col-12">
-            <div class="card-section filter-card compact-filter">
-                <div class="row align-items-center">
-                    <div class="col-md-2">
-                        <div class="section-title mb-md-0 text-md-start">
-                            <h2><i class="fas fa-filter"></i> Filters</h2>
-                        </div>
-                    </div>
-                    <div class="col-md-10">
-                        <form method="GET" action="/player-stats" class="filter-form-horizontal">
-                            <div class="row g-2">
-                                <div class="col-md-3">
-                                    <label for="team" class="form-label compact-label">Team</label>
-                                    <div class="select-wrapper">
-                                        <select name="team" id="team" class="form-control form-control-sm">
-                                            <option value="">All Teams</option>
-                                            {% for team in teams %}
-                                            <option value="{{ team }}" {% if selected_team == team %}selected{% endif %}>{{ team }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="position" class="form-label compact-label">Position</label>
-                                    <div class="select-wrapper">
-                                        <select name="position" id="position" class="form-control form-control-sm">
-                                            <option value="">All Positions</option>
-                                            {% for pos in positions %}
-                                            <option value="{{ pos }}" {% if selected_position == pos %}selected{% endif %}>{{ pos }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="sort_by" class="form-label compact-label">Sort By</label>
-                                    <div class="select-wrapper">
-                                        <select name="sort_by" id="sort_by" class="form-control form-control-sm">
-                                            <option value="agis_score" {% if sort_by == 'agis_score' %}selected{% endif %}>AGIS Score</option>
-                                            <option value="agis_per_game" {% if sort_by == 'agis_per_game' %}selected{% endif %}>AGIS Per Game</option>
-                                            <option value="salary" {% if sort_by == 'salary' %}selected{% endif %}>Salary</option>
-                                            <option value="points" {% if sort_by == 'points' %}selected{% endif %}>Points</option>
-                                            <option value="rebounds" {% if sort_by == 'rebounds' %}selected{% endif %}>Rebounds</option>
-                                            <option value="assists" {% if sort_by == 'assists' %}selected{% endif %}>Assists</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label compact-label">Direction</label>
-                                    <div class="radio-buttons">
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="direction" id="direction_desc" value="desc" {% if direction == 'desc' %}checked{% endif %}>
-                                            <label class="form-check-label" for="direction_desc">Descending</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="direction" id="direction_asc" value="asc" {% if direction == 'asc' %}checked{% endif %}>
-                                            <label class="form-check-label" for="direction_asc">Ascending</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-md-12 text-end">
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-search"></i> Apply
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+            <div class="filter-card">
+                <div class="filter-title">
+                    <i class="fas fa-filter"></i> FILTERS
                 </div>
+                <form method="GET" action="/player-stats">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label class="filter-label">Team</label>
+                            <select name="team" id="team" class="filter-control filter-select">
+                                <option value="">All Teams</option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if selected_team == team %}selected{% endif %}>{{ team }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Position</label>
+                            <select name="position" id="position" class="filter-control filter-select">
+                                <option value="">All Positions</option>
+                                {% for pos in positions %}
+                                <option value="{{ pos }}" {% if selected_position == pos %}selected{% endif %}>{{ pos }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Sort By</label>
+                            <select name="sort_by" id="sort_by" class="filter-control filter-select">
+                                <option value="agis_score" {% if sort_by == 'agis_score' %}selected{% endif %}>AGIS Score</option>
+                                <option value="agis_per_game" {% if sort_by == 'agis_per_game' %}selected{% endif %}>AGIS Per Game</option>
+                                <option value="salary" {% if sort_by == 'salary' %}selected{% endif %}>Salary</option>
+                                <option value="points" {% if sort_by == 'points' %}selected{% endif %}>Points</option>
+                                <option value="rebounds" {% if sort_by == 'rebounds' %}selected{% endif %}>Rebounds</option>
+                                <option value="assists" {% if sort_by == 'assists' %}selected{% endif %}>Assists</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Direction</label>
+                            <div class="filter-radio-group">
+                                <label class="filter-radio-label">
+                                    <input type="radio" name="direction" value="desc" class="filter-radio" {% if direction == 'desc' %}checked{% endif %}>
+                                    <span class="filter-radio-custom"></span>
+                                    Descending
+                                </label>
+                                <label class="filter-radio-label">
+                                    <input type="radio" name="direction" value="asc" class="filter-radio" {% if direction == 'asc' %}checked{% endif %}>
+                                    <span class="filter-radio-custom"></span>
+                                    Ascending
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="filter-btn">
+                            <i class="fas fa-search"></i> Apply
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -178,8 +164,11 @@
             <div class="card-section">
                 <div class="table-header">
                     <h2><i class="fas fa-basketball"></i> Player Statistics</h2>
-                    <button id="download-csv" class="btn btn-success">
-                        Download CSV
+                    <div class="performance-counter">
+                        <span class="counter-badge">{{ players|length }}</span> players found
+                    </div>
+                    <button id="download-performances-csv" class="btn btn-sm btn-outline-success download-btn">
+                        <i class="fas fa-download"></i> Download CSV
                     </button>
                 </div>
                 
@@ -194,46 +183,46 @@
                         <thead class="sticky-header">
                             <tr>
                                 <th class="sortable" data-sort="string">
-                                    <span class="column-label">Player</span>
+                                    <span class="column-label" title="Player name">Player</span>
                                 </th>
                                 <th class="sortable" data-sort="string">
-                                    <span class="column-label">Team</span>
+                                    <span class="column-label" title="Player's team abbreviation">Team</span>
                                 </th>
                                 <th class="sortable" data-sort="string">
-                                    <span class="column-label">Pos</span>
+                                    <span class="column-label" title="Player's position">Pos</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="agis_score">
                                     <span class="column-label" title="Advanced Game Impact Score - Primary metric for player impact">AGIS</span>
                                 </th>
                                 <th class="sortable" data-sort="int" data-column="salary">
-                                    <span class="column-label">Salary</span>
+                                    <span class="column-label" title="Player's annual salary">Salary</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="salary_agis_per_game">
                                     <span class="column-label" title="Salary efficiency metric - Lower is better (Salary × Games) ÷ AGIS²">$/AGIS/G</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="points">
-                                    <span class="column-label">PTS</span>
+                                    <span class="column-label" title="Total points scored">PTS</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="rebounds">
-                                    <span class="column-label">REB</span>
+                                    <span class="column-label" title="Total rebounds (offensive + defensive)">REB</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="assists">
-                                    <span class="column-label">AST</span>
+                                    <span class="column-label" title="Total assists">AST</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="steals">
-                                    <span class="column-label">STL</span>
+                                    <span class="column-label" title="Total steals">STL</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="blocks">
-                                    <span class="column-label">BLK</span>
+                                    <span class="column-label" title="Total blocks">BLK</span>
                                 </th>
                                 <th class="sortable" data-sort="float" data-column="efficiency">
-                                    <span class="column-label">EFF</span>
+                                    <span class="column-label" title="Efficiency rating: PTS + REB + AST + STL + BLK - (FGA-FGM) - (FTA-FTM) - TO">EFF</span>
                                 </th>
                                 <th class="sortable" data-sort="int" data-column="games_played">
-                                    <span class="column-label">GP</span>
+                                    <span class="column-label" title="Games played">GP</span>
                                 </th>
                                 <th class="sortable" data-sort="int" data-column="minutes">
-                                    <span class="column-label">MIN</span>
+                                    <span class="column-label" title="Total minutes played">MIN</span>
                                 </th>
                             </tr>
                         </thead>
@@ -469,7 +458,7 @@
         }
         
         // Initialize CSV download
-        document.getElementById('download-csv').addEventListener('click', function() {
+        document.getElementById('download-performances-csv').addEventListener('click', function() {
             downloadTableAsCSV('player-stats-table', 'nba_player_stats.csv');
         });
         

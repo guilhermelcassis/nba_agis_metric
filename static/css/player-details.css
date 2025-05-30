@@ -1,0 +1,401 @@
+/* Player Details CSS - Shared between player_details.html and player_details_stats.html */
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.loading-spinner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-top-color: var(--nba-highlight);
+    animation: spin 1s linear infinite;
+}
+
+.loading-spinner::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-top-color: var(--nba-blue);
+    animation: spin 0.5s linear infinite reverse;
+}
+
+.loading-text {
+    position: absolute;
+    bottom: -30px;
+    font-size: 1rem;
+    color: var(--nba-highlight);
+    text-align: center;
+    width: 100%;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Performance stat indicators */
+.stat-highlight {
+    color: var(--nba-highlight);
+    font-weight: 700;
+}
+
+.rank-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    margin-left: 0.2rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.rank-elite {
+    background-color: rgba(54, 179, 126, 0.2);
+    color: #4adb73;
+}
+
+.rank-good {
+    background-color: rgba(255, 171, 0, 0.2);
+    color: #fdcb6e;
+}
+
+.rank-average {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #8b97b1;
+}
+
+/* Stats grid layout */
+.stats-grid {
+    display: grid;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    background-color: #1a2234;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.stats-body {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    gap: 0;
+}
+
+.stats-row {
+    display: contents;
+}
+
+.stats-cell {
+    padding: 15px 10px;
+    text-align: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+}
+
+.stats-cell:nth-child(4n) {
+    border-right: none;
+}
+
+.stats-cell:nth-last-child(-n+4) {
+    border-bottom: none;
+}
+
+.stats-label {
+    color: #8b97b1;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.stats-value {
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.stats-value.highlight {
+    color: #f9a826;
+}
+
+.stats-value.positive {
+    color: #4adb73;
+}
+
+.stats-value.negative {
+    color: #ff7675;
+}
+
+.stats-rank {
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    color: #8b97b1;
+}
+
+.stats-pct {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.good-pct {
+    color: #4adb73;
+}
+
+.avg-pct {
+    color: #fdcb6e;
+}
+
+.poor-pct {
+    color: #ff7675;
+}
+
+/* Progress bar styles */
+.stats-bar {
+    height: 4px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin-top: 0.5rem;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+.stats-bar-fill {
+    height: 100%;
+}
+
+.stats-bar-fill.efficiency {
+    background-color: #4adb73;
+}
+
+.stats-bar-fill.agis {
+    background-color: #00b4d8;
+}
+
+/* Value stars */
+.value-stars {
+    color: gold;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Card styling */
+.mini-card {
+    background-color: #1a2234;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.mini-card-header {
+    background-color: #111827;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mini-card-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+}
+
+.mini-card-header h2 i {
+    margin-right: 0.75rem;
+    color: var(--nba-highlight);
+}
+
+.mini-card-header.with-filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mini-profile-section {
+    padding: 1.5rem;
+}
+
+/* Profile details styles */
+.mini-profile-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.mini-context-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mini-context-label {
+    color: #8b97b1;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.mini-context-value {
+    color: #fff;
+    font-weight: 500;
+    text-align: right;
+}
+
+.mini-context-value.salary {
+    color: var(--nba-highlight);
+    font-weight: 600;
+}
+
+/* Game history styling */
+.data-table .selected-game {
+    background-color: rgba(var(--nba-highlight-rgb), 0.15);
+}
+
+.game-link {
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.game-link.current-game {
+    color: var(--nba-highlight);
+    font-weight: 600;
+}
+
+.small-pct {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Header styling */
+.mini-header {
+    background-color: #17408b;
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.mini-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+    margin-top: 0.25rem;
+}
+
+.mini-back-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    text-decoration: none;
+    margin-top: 0.5rem;
+    display: inline-block;
+    transition: color 0.2s ease;
+}
+
+.mini-back-link:hover {
+    color: #fff;
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+    .stats-body {
+        grid-template-columns: repeat(2, 1fr);
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .stats-cell {
+        width: 50%;
+        padding: 10px 8px;
+        min-height: 80px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .stats-cell:nth-child(2n) {
+        border-right: none;
+    }
+    
+    /* Last row handling */
+    .stats-cell:nth-last-child(1):nth-child(odd) {
+        width: 100%;
+        border-right: none;
+    }
+    
+    /* Last two items */
+    .stats-cell:nth-last-child(-n+2) {
+        border-bottom: none;
+    }
+    
+    .stats-value {
+        font-size: 1.2rem;
+    }
+    
+    .mini-profile-section {
+        padding: 1.25rem;
+    }
+    
+    .mini-context-row {
+        padding: 10px 0;
+    }
+    
+    .mini-context-label {
+        font-size: 0.85rem;
+    }
+    
+    .mini-context-value {
+        font-size: 0.9rem;
+    }
+} 

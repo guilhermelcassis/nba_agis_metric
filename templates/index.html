@@ -147,6 +147,9 @@
                 <div class="performance-counter">
                     <span class="counter-badge">{{ players|length }}</span> performances found
                 </div>
+                <button id="download-performances-csv" class="btn btn-sm btn-outline-success download-btn">
+                    <i class="fas fa-download"></i> Download CSV
+                </button>
             </div>
             
             <!-- Mobile swipe hint -->
@@ -160,43 +163,43 @@
                     <thead class="sticky-header">
                         <tr>
                             <th class="sortable" data-sort="string">
-                                <span class="column-label">Player</span>
+                                <span class="column-label" title="Player name">Player</span>
                             </th>
                             <th class="sortable" data-sort="date">
-                                <span class="column-label">Date</span>
+                                <span class="column-label" title="Game date">Date</span>
                             </th>
                             <th class="sortable" data-sort="string">
-                                <span class="column-label">Matchup</span>
+                                <span class="column-label" title="Game matchup information">Matchup</span>
                             </th>
                             <th class="sortable" data-sort="string">
-                                <span class="column-label">Opponent Record</span>
+                                <span class="column-label" title="Opponent team's win-loss record">Opponent Record</span>
                             </th>
                             <th class="sortable" data-sort="time">
-                                <span class="column-label">Minutes</span>
+                                <span class="column-label" title="Minutes played in the game">Minutes</span>
                             </th>
                             <th class="sortable" data-sort="int">
-                                <span class="column-label">PTS</span>
+                                <span class="column-label" title="Total points scored">PTS</span>
                             </th>
                             <th class="sortable" data-sort="int">
-                                <span class="column-label">REB</span>
+                                <span class="column-label" title="Total rebounds (offensive + defensive)">REB</span>
                             </th>
                             <th class="sortable" data-sort="int">
-                                <span class="column-label">AST</span>
+                                <span class="column-label" title="Total assists">AST</span>
                             </th>
                             <th class="sortable" data-sort="int">
-                                <span class="column-label">STL</span>
+                                <span class="column-label" title="Total steals">STL</span>
                             </th>
                             <th class="sortable" data-sort="int">
-                                <span class="column-label">BLK</span>
+                                <span class="column-label" title="Total blocks">BLK</span>
                             </th>
                             <th class="sortable" data-sort="float">
-                                <span class="column-label">EFF</span>
+                                <span class="column-label" title="Efficiency rating: PTS + REB + AST + STL + BLK - (FGA-FGM) - (FTA-FTM) - TO">EFF</span>
                             </th>
                             <th class="sortable" data-sort="float">
-                                <span class="column-label">AGIS</span>
+                                <span class="column-label" title="Advanced Game Impact Score - Explanation Below">AGIS</span>
                             </th>
                             <th class="sortable" data-sort="int">
-                                <span class="column-label">Salary</span>
+                                <span class="column-label" title="Player's annual salary">Salary</span>
                             </th>
                         </tr>
                     </thead>
@@ -298,6 +301,31 @@
             <p>Try selecting a different date range to view playoff performances.</p>
         </div>
     {% endif %}
+    
+    <!-- Metrics explainer section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card-section">
+                <div class="section-title">
+                    <h2><i class="fas fa-info-circle"></i> Understanding Metrics</h2>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6 mb-3 mb-lg-0">
+                        <div class="metric-item">
+                            <div class="metric-icon agis-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h4>AGIS (Advanced Game Impact Score)</h4>
+                                <p>The primary metric for evaluating player impact. Combines statistical performance with game context for a comprehensive measure of player value. Higher scores indicate greater positive impact.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -322,6 +350,14 @@
         
         // Initialize sortable tables
         initTableSort('performances-table');
+        
+        // Initialize CSV download
+        const downloadCsvBtn = document.getElementById('download-performances-csv');
+        if (downloadCsvBtn) {
+            downloadCsvBtn.addEventListener('click', function() {
+                downloadTableAsCSV('performances-table', 'playoff_performances.csv');
+            });
+        }
         
         // Mobile card view handling
         const mobileCards = document.querySelectorAll('.player-mobile-card');
@@ -426,5 +462,54 @@
             });
         }
     });
+    
+    // Function to download table data as CSV
+    function downloadTableAsCSV(tableId, filename) {
+        const table = document.getElementById(tableId);
+        if (!table) return;
+        
+        const rows = table.querySelectorAll('tr');
+        const csvContent = [];
+        
+        // Extract headers
+        const headers = [];
+        table.querySelectorAll('thead th').forEach(th => {
+            headers.push(th.textContent.trim());
+        });
+        csvContent.push(headers.join(','));
+        
+        // Extract data rows
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const rowData = [];
+            row.querySelectorAll('td').forEach(cell => {
+                // Get text content, but remove any link elements
+                let content = cell.textContent.trim();
+                // Remove commas from numbers and escape any commas in text
+                content = content.includes('$') ? content.replace(/[$,]/g, '') : content;
+                content = content.includes(',') ? `"${content}"` : content;
+                rowData.push(content);
+            });
+            csvContent.push(rowData.join(','));
+        });
+        
+        // Create and download the CSV file
+        const csvString = csvContent.join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        // Create download link
+        if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, filename);
+        } else {
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    }
 </script>
 {% endblock %} 

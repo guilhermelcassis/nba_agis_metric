@@ -1044,6 +1044,11 @@ td.salary-agis-per-game[data-value-category="trade"]::after {
 .filter-card {
     background-color: rgba(var(--nba-blue-rgb), 0.05);
     border-left: none;
+    padding: 16px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    position: relative;
 }
 
 .filter-card::before {
@@ -1054,6 +1059,157 @@ td.salary-agis-per-game[data-value-category="trade"]::after {
     margin-right: 0;
     text-align: left;
     font-size: 1.3rem;
+}
+
+/* New filter styling */
+.filter-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--nba-highlight);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-title i {
+    margin-right: 8px;
+    font-size: 1rem;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 160px;
+    position: relative;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.filter-control {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.filter-select {
+    appearance: none;
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+.filter-control:focus {
+    border-color: var(--nba-blue);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--nba-blue-rgb), 0.25);
+}
+
+.filter-radio-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.filter-radio-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-secondary);
+    position: relative;
+}
+
+.filter-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.filter-radio-custom {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-right: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-block;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.filter-radio:checked + .filter-radio-custom {
+    border-color: var(--nba-blue);
+    background-color: rgba(var(--nba-blue-rgb), 0.1);
+}
+
+.filter-radio:checked + .filter-radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--nba-blue);
+}
+
+.filter-radio:focus + .filter-radio-custom {
+    box-shadow: 0 0 0 2px rgba(var(--nba-blue-rgb), 0.25);
+}
+
+.filter-btn {
+    background-color: var(--nba-blue);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    height: 38px;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100px;
+}
+
+.filter-btn i {
+    margin-right: 6px;
+    font-size: 0.9rem;
+}
+
+.filter-btn:hover {
+    background-color: #2250A5;
+    transform: translateY(-1px);
+}
+
+.filter-btn:active {
+    transform: translateY(0);
 }
 
 /* Table headers - more compact for better display of all columns */
@@ -2064,809 +2220,6 @@ td.salary-agis-per-game[data-value-category="trade"]::after {
     font-weight: 600;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 0.3rem;
-}
-
-/* Player Team & Position Styling */
-.player-team, .player-position {
-    display: inline-block;
-    font-weight: 500;
-}
-
-.player-position {
-    position: relative;
-    padding-left: 15px;
-    margin-left: 10px;
-}
-
-.player-position::before {
-    content: '•';
-    position: absolute;
-    left: 5px;
-    color: var(--nba-red);
-}
-
-.player-season {
-    margin-top: 0.5rem;
-}
-
-.season-label {
-    background-color: rgba(0, 0, 0, 0.3);
-    padding: 0.3rem 0.8rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    border-left: 3px solid var(--nba-highlight);
-}
-
-/* Stats Detail Grid */
-.stats-detail {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    text-align: center;
-}
-
-.stats-item {
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-    border-radius: var(--border-radius);
-}
-
-.stats-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stats-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-/* Explainer Box */
-.explainer-box {
-    padding: 0.5rem;
-}
-
-.explainer-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 1.2rem;
-    padding: 1rem;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: var(--border-radius);
-    transition: all 0.2s ease;
-}
-
-.explainer-item:last-child {
-    margin-bottom: 0;
-}
-
-.explainer-item:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-}
-
-.explainer-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.explainer-icon i {
-    font-size: 1.2rem;
-}
-
-.explainer-content {
-    flex: 1;
-}
-
-.explainer-content h4 {
-    font-size: 1rem;
-    margin: 0 0 0.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.explainer-content p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
-
-/* Metric Cards */
-.metric-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.metric-card {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    transition: all 0.2s ease;
-}
-
-.metric-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.metric-card-header {
-    padding: 0.8rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.2);
-    color: var(--text-primary);
-}
-
-.metric-card-header i {
-    margin-right: 5px;
-}
-
-.metric-card-value {
-    font-size: 2.2rem;
-    font-weight: 700;
-    text-align: center;
-    padding: 1rem 0 0.5rem;
-}
-
-.metric-card-desc {
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    padding: 0 0.8rem 1rem;
-}
-
-/* Metric Card Header Colors */
-.agis-score-header {
-    background-color: rgba(0, 188, 212, 0.2);
-    color: #00BCD4;
-}
-
-.agis-per-game-header {
-    background-color: rgba(76, 175, 80, 0.2);
-    color: #4CAF50;
-}
-
-.salary-agis-per-game-header {
-    background-color: rgba(244, 67, 54, 0.2);
-    color: #F44336;
-}
-
-.efficiency-high {
-    background-color: rgba(54, 179, 126, 0.2);
-    color: var(--success);
-}
-
-.efficiency-medium {
-    background-color: rgba(255, 171, 0, 0.2);
-    color: var(--warning);
-}
-
-.efficiency-low {
-    background-color: rgba(255, 86, 48, 0.2);
-    color: var(--danger);
-}
-
-/* Media queries for the new components */
-@media (max-width: 767px) {
-    .metric-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .metric-card-value {
-        font-size: 1.8rem;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .stats-value {
-        font-size: 1.3rem;
-    }
-}
-
-/* Column label styling */
-.column-label {
-    position: relative;
-    padding: 0.2rem 0;
-    display: inline-block;
-}
-
-/* Header hover effect */
-.data-table thead th:hover {
-    color: var(--text-primary);
-}
-
-/* Add additional rounded borders to card sections */
-.card-section {
-    margin-bottom: 1.5rem;
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-/* Form control styling */
-.control-label, .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.select-wrapper {
-    position: relative;
-}
-
-.select-wrapper::after {
-    content: "\f0d7";
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: var(--text-secondary);
-}
-
-/* Compact Dashboard & Header Styling */
-.compact-dashboard {
-    padding: 1.2rem 0;
-    margin-bottom: 1.5rem;
-}
-
-.compact-dashboard .stats-header {
-    text-align: center;
-}
-
-.compact-dashboard .stats-header h1 {
-    font-size: 1.8rem;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.season-badge {
-    background-color: var(--nba-red);
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    margin-left: 8px;
-    display: inline-flex;
-    align-items: center;
-    height: 28px;
-}
-
-/* Compact Filter Styling */
-.compact-filter {
-    padding: 0.8rem 1.2rem;
-    background-color: rgba(var(--nba-blue-rgb), 0.03);
-}
-
-.compact-filter .section-title {
-    margin: 0;
-}
-
-.compact-filter .section-title h2 {
-    font-size: 1.1rem;
-    margin: 0;
-}
-
-.compact-label {
-    font-size: 0.8rem;
-    margin-bottom: 0.3rem;
-}
-
-.filter-form-horizontal .form-control-sm {
-    height: 32px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.85rem;
-}
-
-.filter-form-horizontal .form-check-label {
-    font-size: 0.85rem;
-}
-
-.radio-buttons {
-    display: flex;
-    gap: 0.8rem;
-}
-
-/* Button Styling */
-.btn-sm {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.85rem;
-}
-
-/* Value Categories Styling */
-.value-categories-container {
-    margin-top: 1rem;
-}
-
-.value-categories {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.value-categories li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.6rem;
-    font-size: 0.9rem;
-}
-
-.value-categories li:last-child {
-    margin-bottom: 0;
-}
-
-.value-indicator {
-    flex: 0 0 45px;
-    text-align: center;
-    margin-right: 0.5rem;
-}
-
-.value-description {
-    flex: 1;
-}
-
-.elite-value .value-indicator {
-    color: var(--success);
-}
-
-.good-value .value-indicator {
-    color: var(--warning);
-}
-
-.trade-value .value-indicator {
-    color: var(--danger);
-}
-
-/* Metric Items Styling */
-.metric-item {
-    display: flex;
-    background-color: rgba(0, 0, 0, 0.1);
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    transition: all 0.2s ease;
-    margin-bottom: 1rem;
-}
-
-.metric-hover {
-    background-color: rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-}
-
-.metric-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.metric-info {
-    flex: 1;
-}
-
-.metric-info h4 {
-    font-size: 1.1rem;
-    margin: 0 0 0.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.metric-info p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
-
-.agis-icon {
-    background-color: rgba(var(--nba-blue-rgb), 0.2);
-    color: var(--nba-blue);
-}
-
-.salary-agis-per-game-icon {
-    background-color: rgba(var(--nba-highlight-rgb), 0.2);
-    color: var(--nba-highlight);
-}
-
-/* Table styling specifically for the player stats table */
-#player-stats-table {
-    position: relative;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-#player-stats-table thead {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 100;  /* Very high z-index to overcome any potential issues */
-}
-
-#player-stats-table thead th {
-    position: sticky;
-    top: 0;
-    background-color: var(--card-header);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
-    z-index: 100;
-}
-
-/* Remove the general styling that might conflict */
-#player-stats-table th.sort-asc,
-#player-stats-table th.sort-desc {
-    z-index: 101;
-}
-
-/* Ensure the sorted column styling is visible */
-#player-stats-table th.sort-asc::before,
-#player-stats-table th.sort-desc::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-color: var(--nba-highlight);
-    z-index: 102;
-}
-
-/* Specific sticky header styling */
-.sticky-header {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1000 !important;
-}
-
-.sticky-header th {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 1000 !important;
-    background-color: var(--card-header) !important;
-}
-
-/* Ultra compact mini components styling */
-.mini-header {
-    background: linear-gradient(135deg, var(--nba-blue), #0B2349);
-    color: white;
-    padding: 0.8rem 0;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-    border-radius: var(--border-radius);
-}
-
-.mini-title {
-    font-size: 1.5rem;
-    margin: 0;
-    font-weight: 700;
-    color: white;
-    display: flex;
-    flex-direction: column;
-}
-
-.mini-subtitle {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-top: 0.2rem;
-}
-
-.mini-metrics {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.8rem;
-}
-
-.mini-stat {
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    padding: 0.4rem 0.6rem;
-    min-width: 55px;
-}
-
-.mini-stat.highlight {
-    background-color: rgba(var(--nba-highlight-rgb), 0.15);
-}
-
-.mini-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    display: block;
-    line-height: 1.2;
-}
-
-.mini-label {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.mini-back-link {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
-    transition: color 0.2s;
-    white-space: nowrap;
-}
-
-.mini-back-link:hover {
-    color: var(--nba-highlight);
-}
-
-.mini-card {
-    background-color: var(--card-bg);
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.mini-card-header {
-    background-color: rgba(var(--nba-blue-rgb), 0.15);
-    padding: 0.6rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.mini-card-header h2 {
-    font-size: 1rem;
-    margin: 0;
-    color: var(--nba-highlight);
-    font-weight: 600;
-}
-
-.mini-card-header h2 i {
-    margin-right: 0.4rem;
-    opacity: 0.8;
-}
-
-.mini-card-header.with-filter {
-    padding-right: 0.5rem;
-}
-
-.mini-card-section {
-    padding: 0.8rem 1rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.mini-card-section:last-child {
-    border-right: none;
-}
-
-.mini-stat-box {
-    padding: 0.7rem 0.5rem;
-    text-align: center;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.mini-stat-box:nth-child(3n) {
-    border-right: none;
-}
-
-.mini-stat-box:nth-last-child(-n+3) {
-    border-bottom: none;
-}
-
-.mini-pct {
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-top: 0.2rem;
-}
-
-.mini-pct.good-pct {
-    color: var(--success);
-}
-
-.mini-pct.avg-pct {
-    color: var(--warning);
-}
-
-.mini-pct.poor-pct {
-    color: var(--danger);
-}
-
-.mini-metric-box {
-    padding: 0.7rem 0.5rem;
-    text-align: center;
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.mini-metric-box:nth-child(2n) {
-    border-right: none;
-}
-
-.mini-metric-box:nth-last-child(-n+2) {
-    border-bottom: none;
-}
-
-.mini-metric-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.3rem;
-    font-weight: 500;
-}
-
-.mini-metric-value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 0.2rem;
-}
-
-.mini-metric-desc {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-}
-
-.mini-value-indicator {
-    font-size: 0.7rem;
-    margin-top: 0.2rem;
-}
-
-.mini-value-legend {
-    padding: 0.7rem 1rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-}
-
-.mini-value-item {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    min-width: 150px;
-}
-
-.mini-value-symbol {
-    margin-right: 0.5rem;
-    font-size: 0.8rem;
-    min-width: 20px;
-    text-align: center;
-}
-
-.mini-value-text {
-    font-size: 0.8rem;
-}
-
-.mini-profile-section {
-    padding: 0.7rem 0.8rem;
-}
-
-.mini-profile-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-}
-
-.mini-context-row {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-}
-
-.mini-context-label {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    min-width: 90px;
-}
-
-.mini-context-value {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.mini-efficiency-category {
-    font-size: 0.75rem;
-    margin-left: 0.3rem;
-}
-
-.salary-agis-per-game-value {
-    font-weight: 700;
-}
-
-.salary-metrics .mini-context-row {
-    margin-top: 0.3rem;
-}
-
-/* Media queries for mini components */
-@media (max-width: 767px) {
-    .mini-metrics {
-        justify-content: center;
-        margin-top: 0.5rem;
-    }
-    
-    .mini-card-section {
-        border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 0.6rem 1rem;
-    }
-    
-    .mini-card-section:last-child {
-        border-bottom: none;
-    }
-    
-    .mini-stat-box:nth-child(3n) {
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .mini-stat-box:nth-child(2n) {
-        border-right: none;
-    }
-    
-    .mini-stat-box:nth-last-child(-n+3) {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .mini-stat-box:nth-last-child(-n+2) {
-        border-bottom: none;
-    }
-}
-
-/* Highlight the first row in the performance table - Dynamite of the Night */
-#performances-table tbody tr:first-child {
-    background-color: rgba(255, 59, 48, 0.1);
-    position: relative;
-}
-
-#performances-table tbody tr:first-child td {
-    position: relative;
-}
-
-#performances-table tbody tr:first-child td:first-child {
-    border-left: 3px solid var(--dynamite-red);
-}
-
-#performances-table tbody tr:first-child td:first-child .player-link {
-    font-weight: 700;
-    color: var(--dynamite-red);
-}
-
-#performances-table tbody tr:first-child td:first-child .player-link:before {
-    content: "🧨";
-    margin-right: 5px;
-}
-
-#performances-table tbody tr:first-child:hover {
-    background-color: rgba(255, 59, 48, 0.15);
 }
 
 /* Player Team & Position Styling */

@@ -1,6 +1,6 @@
 /* Mobile-first CSS for NBA Dynastat */
 
-/* Base responsive styles */
+/* Base responsive extensions - only include mobile-specific overrides */
 :root {
   --nba-blue: #17408B;
   --nba-blue-rgb: 23, 64, 139;
@@ -20,92 +20,91 @@
   --danger: #FF5630;
   --border-radius: 8px;
   --dynamite-red: #FF3B30;
-  --card-padding: 10px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
+  --card-padding-mobile: 10px;
+  --spacing-sm-mobile: 8px;
+  --spacing-md-mobile: 16px;
+  --spacing-lg-mobile: 24px;
 }
 
-/* Global resets for mobile-first */
-* {
-  box-sizing: border-box;
-}
-
+/* Global mobile optimizations */
 html, body {
   overscroll-behavior: none; /* Prevent bounce effects */
   touch-action: manipulation; /* Better touch performance */
 }
 
 body {
-  font-size: 16px;
-  line-height: 1.5;
   -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
 }
 
-.container {
-  width: 100%;
-  padding-left: var(--spacing-sm);
-  padding-right: var(--spacing-sm);
+/* Mobile-specific container adjustments */
+@media (max-width: 767px) {
+  .container {
+    padding-left: var(--spacing-sm-mobile);
+    padding-right: var(--spacing-sm-mobile);
+  }
+  
+  /* Add space at bottom for mobile nav */
+  .main-container {
+    padding-bottom: 70px;
+  }
+  
+  .footer {
+    margin-bottom: 60px;
+  }
 }
 
 /* Touch-friendly buttons and controls */
 button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
   min-height: 44px; /* Apple's recommendation for touch targets */
-  padding: 10px 16px;
 }
 
 /* Mobile navigation optimizations */
-.navbar {
-  padding: 8px 0;
+@media (max-width: 767px) {
+  .navbar {
+    padding: 8px 0;
+  }
+  
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  
+  .navbar-toggler {
+    border: none;
+    padding: 8px;
+  }
+  
+  .navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+  }
+  
+  .navbar-nav .nav-link {
+    padding: 12px 15px;
+    margin: 2px 0;
+  }
 }
 
-.navbar-brand {
-  font-size: 1.2rem;
-}
-
-.navbar-toggler {
-  border: none;
-  padding: 8px;
-}
-
-.navbar-toggler:focus {
-  box-shadow: none;
-  outline: none;
-}
-
-.navbar-nav .nav-link {
-  padding: 12px 15px;
-  margin: 2px 0;
-  border-radius: var(--border-radius);
-}
-
-/* Table responsiveness */
-.table-container {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  margin: 0 -12px; /* Negative margin to visually indicate scrollability */
-  padding: 0 12px;
-  position: relative;
-}
-
-.data-table {
-  width: 100%;
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-.data-table thead th {
-  position: sticky;
-  top: 0;
-  background-color: var(--card-header);
-  z-index: 10;
-  padding: 12px 8px;
-  font-size: 0.8rem;
-}
-
-.data-table tbody td {
-  padding: 12px 8px;
-  font-size: 0.9rem;
+/* Table responsiveness for mobile */
+@media (max-width: 767px) {
+  .table-container {
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    margin: 0 -12px; /* Negative margin to visually indicate scrollability */
+    padding: 0 12px;
+  }
+  
+  .data-table {
+    white-space: nowrap;
+  }
+  
+  .data-table thead th {
+    padding: 12px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .data-table tbody td {
+    padding: 12px 8px;
+    font-size: 0.9rem;
+  }
 }
 
 /* Mobile Cards for Tables */
@@ -128,6 +127,7 @@ button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
     padding: 12px;
     position: relative;
     border-left: 4px solid var(--nba-highlight);
+    animation: card-appear 0.3s ease-out;
   }
   
   .player-mobile-card-header {
@@ -226,6 +226,11 @@ button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
     100% { transform: translateX(0); opacity: 0.5; }
   }
   
+  @keyframes card-appear {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
   /* Load more button for mobile */
   .load-more-container {
     text-align: center;
@@ -245,16 +250,6 @@ button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
   
   .load-more-btn:active {
     transform: scale(0.98);
-  }
-  
-  /* Card transition animations */
-  .player-mobile-card {
-    animation: card-appear 0.3s ease-out;
-  }
-  
-  @keyframes card-appear {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
   }
   
   /* Stat highlights */
@@ -295,149 +290,90 @@ button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
   .mobile-player-link i {
     margin-left: 5px;
   }
-}
-
-/* Card and section improvements */
-.card-section {
-  padding: 12px;
-  margin-bottom: 16px;
-  border-radius: var(--border-radius);
-}
-
-/* Form controls optimization */
-.form-control {
-  height: 44px;
-  font-size: 16px; /* Prevents iOS zoom on focus */
-}
-
-.form-label {
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-}
-
-/* Stats display on mobile */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.stats-item {
-  padding: 10px;
-  text-align: center;
-}
-
-.stats-value {
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.stats-label {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-/* Filters and toolbars */
-.filter-form-horizontal {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.filter-form-horizontal .row {
-  margin: 0;
-}
-
-.compact-label {
-  font-size: 0.8rem;
-}
-
-/* Date pickers and inputs */
-.datepicker, .input-icon-wrapper {
-  width: 100%;
-}
-
-.input-icon {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  color: var(--text-secondary);
-  z-index: 2;
-}
-
-.input-icon-wrapper .form-control {
-  padding-left: 35px;
-}
-
-/* Better buttons */
-.btn {
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-}
-
-.btn-sm {
-  height: 38px;
-  font-size: 0.9rem;
-}
-
-.btn i {
-  font-size: 0.9rem;
-}
-
-/* Player cards */
-.player-info {
-  padding: 15px 0;
-}
-
-.player-info h1 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-}
-
-.metric-badge {
-  padding: 8px 12px;
-  margin: 5px;
-  font-size: 0.9rem;
-}
-
-.badge-value {
-  font-size: 1.2rem;
-}
-
-.badge-label {
-  font-size: 0.8rem;
-}
-
-/* Loading state */
-.loading-overlay {
-  background-color: rgba(15, 22, 36, 0.9);
-}
-
-/* Pull to refresh hint */
-.pull-indicator {
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  overflow: hidden;
-  transition: height 0.3s;
-}
-
-.pull-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid transparent;
-  border-top-color: var(--nba-highlight);
-  border-radius: 50%;
-  margin-right: 10px;
-  animation: spin 1s linear infinite;
+  
+  /* Mobile layout for download button */
+  .download-btn {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  /* Mobile form controls optimization */
+  .form-control {
+    height: 44px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Mobile-optimized stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .stats-item {
+    padding: 10px;
+  }
+  
+  .stats-value {
+    font-size: 1.1rem;
+  }
+  
+  .stats-label {
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile filters and toolbars */
+  .filter-form-horizontal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .filter-form-horizontal .row {
+    margin: 0;
+  }
+  
+  /* Mobile-optimized datepickers */
+  .datepicker, .input-icon-wrapper {
+    width: 100%;
+  }
+  
+  /* Mobile-optimized buttons */
+  .btn {
+    width: 100%;
+  }
+  
+  /* Player card mobile adjustments */
+  .player-info {
+    padding: 15px 0;
+  }
+  
+  .player-info h1 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  
+  .metric-badge {
+    padding: 8px 12px;
+    margin: 5px;
+    font-size: 0.9rem;
+  }
+  
+  .badge-value {
+    font-size: 1.2rem;
+  }
+  
+  .badge-label {
+    font-size: 0.8rem;
+  }
 }
 
 /* Bottom navigation for mobile */
@@ -483,31 +419,6 @@ button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
     padding-bottom: 0;
   }
   
-  .container {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  
-  .card-section {
-    padding: 20px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .player-info h1 {
-    font-size: 2rem;
-  }
-  
-  .filter-form-horizontal {
-    flex-direction: row;
-  }
-  
-  .filter-form-horizontal .row {
-    width: 100%;
-  }
-  
   /* Hide mobile card view on desktop */
   .mobile-card-view {
     display: none;
@@ -519,18 +430,7 @@ button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
   }
 }
 
-/* Add space at bottom for mobile nav */
-@media (max-width: 767px) {
-  .main-container {
-    padding-bottom: 70px;
-  }
-  
-  .footer {
-    margin-bottom: 60px;
-  }
-}
-
-/* Animations */
+/* Mobile-specific animations */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -541,4 +441,109 @@ button, .btn, a.nav-link, select, input[type="text"], input[type="date"] {
   0% { opacity: 0.6; }
   50% { opacity: 1; }
   100% { opacity: 0.6; }
+}
+
+/* Pull to refresh indicator */
+.pull-indicator {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  overflow: hidden;
+  transition: height 0.3s;
+}
+
+.pull-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top-color: var(--nba-highlight);
+  border-radius: 50%;
+  margin-right: 10px;
+  animation: spin 1s linear infinite;
+}
+
+/* Mobile-specific performance stats grid adjustments */
+@media (max-width: 767px) {
+  .stats-body {
+    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .stats-cell {
+    width: 50%;
+    padding: 10px 8px;
+    min-height: 80px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .stats-cell:nth-child(2n) {
+    border-right: none;
+  }
+  
+  /* Last row handling */
+  .stats-cell:nth-last-child(1):nth-child(odd) {
+    width: 100%;
+    border-right: none;
+  }
+  
+  /* Last two items */
+  .stats-cell:nth-last-child(-n+2) {
+    border-bottom: none;
+  }
+  
+  .stats-value {
+    font-size: 1.2rem;
+  }
+  
+  .filter-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  /* Mobile filter optimizations */
+  .filter-title {
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+  }
+  
+  .filter-btn {
+    width: 100%;
+    margin-top: 10px;
+    height: 44px;
+  }
+  
+  .filter-radio-group {
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 10px;
+  }
+  
+  .filter-label {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  
+  .filter-control {
+    height: 44px;
+    font-size: 16px;
+  }
+  
+  .filter-card {
+    padding: 12px;
+  }
 } 
